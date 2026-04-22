@@ -51,4 +51,28 @@ export default defineSchema({
     koordinator: v.string(),
     anggota: v.array(v.string()),
   }),
+  /**
+   * Tabel galeri: Foto & Video kegiatan
+   * Digunakan oleh: admin/galeri (CRUD) dan public/galeri (tampilan)
+   */
+  galeri: defineTable({
+    caption: v.optional(v.string()),
+    url: v.string(), // Public R2 URL
+    storageKey: v.string(), // R2 Key for deletion
+    type: v.union(v.literal("image"), v.literal("video")),
+    year: v.string(), // Contoh: "2024", "2025"
+  }).index("by_year", ["year"]),
+
+  /**
+   * Tabel metadata album: Informasi cerita per tahun
+   */
+  album_metadata: defineTable({
+    year: v.string(),
+    title: v.string(),
+    subtitle: v.string(),
+    description: v.string(),
+    coverUrl: v.optional(v.string()),
+    coverStorageKey: v.optional(v.string()),
+  }).index("by_year", ["year"]),
 });
+

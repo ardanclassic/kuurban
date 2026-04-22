@@ -8,6 +8,7 @@
  * @module
  */
 
+import type * as galeri from "../galeri.js";
 import type * as panitia from "../panitia.js";
 import type * as rapat from "../rapat.js";
 import type * as shohibulKurban from "../shohibulKurban.js";
@@ -19,6 +20,7 @@ import type {
 } from "convex/server";
 
 declare const fullApi: ApiFromModules<{
+  galeri: typeof galeri;
   panitia: typeof panitia;
   rapat: typeof rapat;
   shohibulKurban: typeof shohibulKurban;

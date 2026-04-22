@@ -3,7 +3,7 @@
 import { ReactNode, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { LayoutDashboard, Users, ShieldCheck, LogOut, Menu, X, MessageSquare, User } from "lucide-react";
+import { LayoutDashboard, Users, ShieldCheck, LogOut, Menu, X, MessageSquare, User, Image as ImageIcon } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "@/lib/utils";
 import AdminGuard from "@/components/AdminGuard";
@@ -18,6 +18,7 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
     { name: "Dashboard", href: "/admin", icon: LayoutDashboard },
     { name: "Data Kurban", href: "/admin/kurban", icon: Users },
     { name: "Susunan Panitia", href: "/admin/panitia", icon: ShieldCheck },
+    { name: "Galeri Dokumentasi", href: "/admin/galeri", icon: ImageIcon },
     { name: "Hasil Rapat", href: "/admin/rapat", icon: MessageSquare },
   ];
 

@@ -22,7 +22,7 @@ export default function PublicFooter() {
             </div>
           </div>
           <p className="text-indigo-200/70 text-sm leading-loose max-w-sm">
-            Platform Manajemen Kurban Perumahan. Menghadirkan kemudahan pendaftaran, transparansi kuota, hingga kerapian pelaksanaan secara digital demi mengejar ridho Allah SWT.
+            Platform Manajemen Kurban Perumahan. Menghadirkan kemudahan pendaftaran, transparansi kuota, hingga kerapian pelaksanaan secara digital demi mengejar ridho Allah &#65019;.
           </p>
         </div>
 
@@ -43,6 +43,11 @@ export default function PublicFooter() {
             <li>
               <Link href="/jadwal" className="group flex items-center gap-2 text-indigo-200 hover:text-white transition-colors text-sm font-medium">
                 <ArrowRight className="w-3 h-3 text-indigo-600 group-hover:text-amber-400 transition-colors" /> Jadwal Acara
+              </Link>
+            </li>
+            <li>
+              <Link href="/galeri" className="group flex items-center gap-2 text-indigo-200 hover:text-white transition-colors text-sm font-medium">
+                <ArrowRight className="w-3 h-3 text-indigo-600 group-hover:text-amber-400 transition-colors" /> Galeri Kegiatan
               </Link>
             </li>
             <li className="pt-4 mt-4 border-t border-indigo-900/40">

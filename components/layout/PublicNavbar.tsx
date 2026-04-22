@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
-import { Menu, X, Heart, Calendar, Home, Phone, ChevronRight, ShieldCheck } from "lucide-react";
+import { Menu, X, Heart, Calendar, Home, Phone, ChevronRight, ShieldCheck, Image as ImageIcon } from "lucide-react";
 import { useState, useEffect } from "react";
 import { cn } from "@/lib/utils";
 
@@ -11,6 +11,7 @@ const links = [
   { name: "Beranda", href: "/", icon: Home },
   { name: "Info Kurban", href: "/kurban", icon: Heart },
   { name: "Jadwal Acara", href: "/jadwal", icon: Calendar },
+  { name: "Galeri", href: "/galeri", icon: ImageIcon },
 ];
 
 export default function PublicNavbar() {
