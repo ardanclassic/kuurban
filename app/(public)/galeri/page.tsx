@@ -10,10 +10,13 @@ import {
   Clapperboard
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import FullScreenLoader from "@/components/ui/FullScreenLoader";
 
 export default function GaleriPublic() {
   const allItems = useQuery(api.galeri.getItems, {});
   const albumMetadata = useQuery(api.galeri.getAlbumMetadata);
+  
+  const isLoading = allItems === undefined || albumMetadata === undefined;
 
   const [activeYear, setActiveYear] = useState<string | null>(null);
   const [selectedMedia, setSelectedMedia] = useState<any>(null);
@@ -96,8 +99,10 @@ export default function GaleriPublic() {
   const currentAlbum = displayAlbums.find(a => a.year === activeYear);
 
   return (
-    <div className="space-y-16 py-10 pb-32">
-      {/* ── HEADER ── */}
+    <>
+      <FullScreenLoader isLoading={isLoading} text="Memuat Galeri..." />
+      <div className={cn("space-y-16 py-10 pb-32 transition-opacity duration-500", isLoading ? "opacity-0" : "opacity-100")}>
+        {/* ── HEADER ── */}
       <div className="text-center space-y-5 max-w-2xl mx-auto">
         <motion.div initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-indigo-50 border border-indigo-100 text-indigo-600">
           <Clapperboard size={14} className="animate-pulse" />
@@ -339,5 +344,6 @@ export default function GaleriPublic() {
         )}
       </AnimatePresence>
     </div>
+    </>
   );
 }

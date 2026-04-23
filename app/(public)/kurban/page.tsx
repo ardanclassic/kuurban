@@ -7,6 +7,7 @@ import { PawPrint, Phone, CheckCircle2, Users, MessageCircle, X, ChevronRight } 
 import { useQuery } from "convex/react";
 import { api } from "@/convex/_generated/api";
 import { cn } from "@/lib/utils";
+import FullScreenLoader from "@/components/ui/FullScreenLoader";
 
 // ============================================================
 // DATA PENYEDIA KAMBING - TETAP STATIS KARENA BELUM ADA DB-NYA
@@ -19,6 +20,8 @@ const penyediaKambing = [
 
 export default function KurbanPage() {
   const kurbanData = useQuery(api.shohibulKurban.getAll);
+  const isLoading = kurbanData === undefined;
+  
   const [activeModal, setActiveModal] = useState<"kelompok" | "mandiri" | "kambing" | null>(null);
 
   const openWA = (wa: string, pesan: string) => {
@@ -111,7 +114,9 @@ export default function KurbanPage() {
   const currentTheme = menuOptions.find(m => m.id === activeModal)?.theme;
 
   return (
-    <div className="space-y-12 py-10 pb-32">
+    <>
+      <FullScreenLoader isLoading={isLoading} text="Memuat Informasi Kurban..." />
+      <div className={cn("space-y-12 py-10 pb-32 transition-opacity duration-500", isLoading ? "opacity-0" : "opacity-100")}>
 
       {/* ── PAGE HEADER ── */}
       <div className="text-center space-y-5 max-w-2xl mx-auto">
@@ -424,5 +429,6 @@ export default function KurbanPage() {
       </AnimatePresence>
 
     </div>
+    </>
   );
 }
