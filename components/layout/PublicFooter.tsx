@@ -22,7 +22,7 @@ export default function PublicFooter() {
             </div>
           </div>
           <p className="text-indigo-200/70 text-sm leading-loose max-w-sm">
-            Platform Manajemen Kurban Perumahan. Menghadirkan kemudahan pendaftaran, transparansi kuota, hingga kerapian pelaksanaan secara digital demi mengejar ridho Allah &#65019;.
+            Platform Manajemen Kurban Warga. Menghadirkan kemudahan pendaftaran, transparansi kuota, hingga kerapian pelaksanaan secara digital demi mengejar ridho Allah &#65019;.
           </p>
         </div>
 

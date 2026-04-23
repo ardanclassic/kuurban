@@ -203,7 +203,7 @@ export default function HomePage() {
               <div className="space-y-8">
                 {[
                   { t: "Pilih Slot", d: "Masuk ke halaman Info Kurban dan pilih kelompok yang masih kosong." },
-                  { t: "Transfer Dana", d: "Selesaikan pembayaran ke Rek. BCA Bendahara (Drs. Heru Bawono)." },
+                  { t: "Transfer Dana", d: "Selesaikan pembayaran ke Rek. BCA Bendahara (A'an Prihantoro)." },
                   { t: "Konfirmasi WA", d: "Kirim bukti transfer ke WhatsApp Panitia agar nama terbit di website." }
                 ].map((s, i) => (
                   <div key={i} className="flex gap-4">

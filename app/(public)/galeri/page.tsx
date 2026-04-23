@@ -7,7 +7,7 @@ import { api } from "@/convex/_generated/api";
 import {
   ArrowLeft, X, Play, Image as ImageIcon,
   Video as VideoIcon, Calendar, ChevronRight,
-  Maximize2, Share2, Info, LayoutGrid
+  Clapperboard
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -100,13 +100,13 @@ export default function GaleriPublic() {
       {/* ── HEADER ── */}
       <div className="text-center space-y-5 max-w-2xl mx-auto">
         <motion.div initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-indigo-50 border border-indigo-100 text-indigo-600">
-          <Calendar size={14} className="animate-pulse" />
+          <Clapperboard size={14} className="animate-pulse" />
           <span className="text-[10px] font-bold uppercase tracking-[0.2em]">Arsip & Dokumentasi</span>
         </motion.div>
         <h1 className="text-4xl md:text-6xl font-black text-slate-900 tracking-tight leading-tight ">
-          Galeri <span className="text-indigo-600">Al Ukhuwah</span>
+          Galeri <span className="text-indigo-600">Kurban</span>
         </h1>
-        <p className="text-slate-500 font-medium text-sm md:text-lg max-w-xl mx-auto leading-relaxed">
+        <p className="text-slate-500 font-medium text-base md:text-lg max-w-xl mx-auto leading-relaxed">
           Menapak tilas perjalanan ibadah kurban dari tahun ke tahun. Setiap foto menyimpan cerita, setiap video merekam keberkahan.
         </p>
       </div>
@@ -217,10 +217,10 @@ export default function GaleriPublic() {
                         Dokumentasi {activeYear}
                       </motion.div>
                       <div className="space-y-2">
-                        <motion.h2 initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }} className="text-5xl md:text-9xl font-black text-white leading-[0.85] tracking-tighter drop-shadow-2xl mb-6">
+                        <motion.h2 initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }} className="text-3xl md:text-9xl font-black text-white leading-[0.85] tracking-tighter drop-shadow-2xl mb-6">
                           {currentAlbum.title}
                         </motion.h2>
-                        <motion.h3 initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.4 }} className="text-2xl md:text-5xl font-bold text-indigo-100 italic drop-shadow-[0_4px_12px_rgba(0,0,0,0.5)] leading-tight">
+                        <motion.h3 initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.4 }} className="text-xl md:text-5xl font-bold text-indigo-100 italic drop-shadow-[0_4px_12px_rgba(0,0,0,0.5)] leading-tight">
                           "{currentAlbum.subtitle}"
                         </motion.h3>
                       </div>

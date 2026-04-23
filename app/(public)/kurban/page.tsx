@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import CowGroupCard from "@/components/kurban/CowGroupCard";
-import { Heart, Phone, CheckCircle2, Users, ExternalLink, MessageCircle, X, ChevronRight } from "lucide-react";
+import { PawPrint, Phone, CheckCircle2, Users, MessageCircle, X, ChevronRight } from "lucide-react";
 import { useQuery } from "convex/react";
 import { api } from "@/convex/_generated/api";
 import { cn } from "@/lib/utils";
@@ -115,11 +115,12 @@ export default function KurbanPage() {
 
       {/* ── PAGE HEADER ── */}
       <div className="text-center space-y-5 max-w-2xl mx-auto">
-        <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-amber-100 border border-amber-200 text-amber-800 text-xs font-bold uppercase tracking-widest shadow-sm">
-          <span>🐐</span> Idul Kurban 1447 H
+        <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-indigo-50 border border-indigo-100 text-indigo-600">
+          <PawPrint size={14} className="animate-pulse" />
+          <span className="text-[10px] font-bold uppercase tracking-[0.2em]">Idul Kurban 1447 H</span>
         </div>
-        <h1 className="text-3xl md:text-5xl font-black text-slate-900 tracking-tight leading-tight">
-          Niat Berqurban <br /> Tahun Ini?
+        <h1 className="text-4xl md:text-6xl font-black text-slate-900 tracking-tight leading-tight ">
+          Pilih Jenis <span className="text-indigo-600">Kurban Anda</span>
         </h1>
         <p className="text-slate-500 font-medium text-base md:text-lg leading-relaxed">
           Pilih jenis kurban yang pas di hati. Panitia siap bantu urus dari penyediaan, penyembelihan, hingga distribusi. Praktis, amanah, dan InsyaaAllah berkah! ✨
@@ -143,10 +144,10 @@ export default function KurbanPage() {
             <div className="relative z-10 flex flex-col h-full">
               <div className="flex items-start justify-between mb-8">
                 <div className={`w-14 h-14 shrink-0 rounded-2xl flex items-center justify-center font-bold text-2xl shadow-lg ${menu.theme.bg} text-white ${menu.theme.shadow} transition-transform duration-300 group-hover:scale-110 group-hover:-rotate-3`}>
-                   {menu.icon}
+                  {menu.icon}
                 </div>
                 <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-slate-100 text-slate-500 text-[10px] font-bold uppercase tracking-wider backdrop-blur-sm">
-                   {menu.stats}
+                  {menu.stats}
                 </div>
               </div>
 
@@ -209,16 +210,16 @@ export default function KurbanPage() {
               {/* Scrollable Content Inside Modal */}
               <div className="flex-1 overflow-y-auto p-4 md:p-8">
                 {/* ════ MODAL DESCRIPTION ════ */}
-                <div className={cn("mb-8 p-6 border-l-4 rounded-r-3xl rounded-l-lg shadow-sm", 
-                  activeModal === 'kelompok' ? 'bg-indigo-50 border-indigo-500' : 
-                  activeModal === 'mandiri' ? 'bg-amber-50 border-amber-500' : 
-                  'bg-emerald-50 border-emerald-500'
+                <div className={cn("mb-8 p-6 border-l-4 rounded-r-3xl rounded-l-lg shadow-sm",
+                  activeModal === 'kelompok' ? 'bg-indigo-50 border-indigo-500' :
+                    activeModal === 'mandiri' ? 'bg-amber-50 border-amber-500' :
+                      'bg-emerald-50 border-emerald-500'
                 )}>
                   <div className="flex items-start gap-4">
-                    <div className={cn("w-1.5 h-10 rounded-full hidden md:block", 
-                      activeModal === 'kelompok' ? 'bg-indigo-500/20' : 
-                      activeModal === 'mandiri' ? 'bg-amber-500/20' : 
-                      'bg-emerald-500/20'
+                    <div className={cn("w-1.5 h-10 rounded-full hidden md:block",
+                      activeModal === 'kelompok' ? 'bg-indigo-500/20' :
+                        activeModal === 'mandiri' ? 'bg-amber-500/20' :
+                          'bg-emerald-500/20'
                     )} />
                     <p className="text-slate-700 font-bold leading-relaxed text-sm md:text-base">
                       {activeModal === "kelompok" && "Panitia membuka pendaftaran Sapi Kelompok. 1 kelompok sapi berisikan maksimal 7 pendaftar/shohibul qurban. Silakan lihat daftar kelompok di bawah ini."}
@@ -245,13 +246,13 @@ export default function KurbanPage() {
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div className="space-y-1">
                           <p className="text-[10px] font-bold text-slate-400 uppercase tracking-tight">Transfer ke Rekening BCA</p>
-                          <p className="text-xl font-bold text-slate-900 tracking-tight">0331.587.426</p>
-                          <p className="text-sm font-bold text-slate-600">a/n Drs. Heru Bawono</p>
+                          <p className="text-xl font-bold text-slate-900 tracking-tight">0241412678</p>
+                          <p className="text-sm font-bold text-slate-600">a/n A'an Prihantoro</p>
                         </div>
                         <div className="space-y-3">
                           <p className="text-[10px] font-bold text-slate-400 uppercase tracking-tight">Konfirmasi WhatsApp</p>
                           <button
-                            onClick={() => openWA("6281330739337", "Assamu'alaikum Pak Heru, saya ingin konfirmasi transfer kurban Sapi Kelompok.")}
+                            onClick={() => openWA("6281325956533", "Assamu'alaikum Pak A'an, saya ingin konfirmasi transfer kurban Sapi Kelompok.")}
                             className={cn("flex items-center gap-4 p-4 bg-white border rounded-2xl hover:shadow-lg transition-all text-left group/btn w-full", currentTheme?.border)}
                           >
                             <div className={cn("w-10 h-10 rounded-xl flex items-center justify-center shrink-0 transition-colors", currentTheme?.light, `group-hover/btn:${currentTheme?.bg}`)}>
@@ -259,8 +260,8 @@ export default function KurbanPage() {
                             </div>
                             <div className="flex-1 min-w-0">
                               <p className="text-[10px] font-bold text-slate-400 uppercase tracking-tight leading-none mb-1">Bendahara</p>
-                              <p className="text-sm font-bold text-slate-900 truncate">Heru Bawono</p>
-                              <p className={cn("text-xs font-bold", currentTheme?.primary)}>0813-3073-9337</p>
+                              <p className="text-sm font-bold text-slate-900 truncate">Aan Prihantoro</p>
+                              <p className={cn("text-xs font-bold", currentTheme?.primary)}>0813-2595-6533</p>
                             </div>
                           </button>
                         </div>
@@ -269,6 +270,19 @@ export default function KurbanPage() {
                       <div className="space-y-4">
                         <p className="text-sm font-bold text-slate-700 leading-snug">Silakan hubungi panitia untuk pendaftaran & koordinasi:</p>
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                          <button
+                            onClick={() => openWA("6281325956533", `Assamu'alaikum Pak A'an, saya ingin mendaftar kurban ${activeModal === 'mandiri' ? 'Sapi Mandiri' : 'Kambing'}.`)}
+                            className={cn("flex items-center gap-4 p-4 bg-white border rounded-2xl hover:shadow-lg transition-all text-left group/btn", currentTheme?.border)}
+                          >
+                            <div className={cn("w-10 h-10 rounded-xl flex items-center justify-center shrink-0 transition-colors", currentTheme?.light, `group-hover/btn:${currentTheme?.bg}`)}>
+                              <MessageCircle className={cn("w-5 h-5 transition-colors", currentTheme?.primary, "group-hover/btn:text-white")} />
+                            </div>
+                            <div className="flex-1 min-w-0">
+                              <p className="text-[10px] font-bold text-slate-400 uppercase tracking-tight leading-none mb-1">Panitia</p>
+                              <p className="text-sm font-bold text-slate-900 truncate">Aan Prihantoro</p>
+                              <p className={cn("text-xs font-bold", currentTheme?.primary)}>0813-2595-6533</p>
+                            </div>
+                          </button>
                           <button
                             onClick={() => openWA("6281330739337", `Assamu'alaikum Pak Heru, saya ingin mendaftar kurban ${activeModal === 'mandiri' ? 'Sapi Mandiri' : 'Kambing'}.`)}
                             className={cn("flex items-center gap-4 p-4 bg-white border rounded-2xl hover:shadow-lg transition-all text-left group/btn", currentTheme?.border)}
@@ -280,19 +294,6 @@ export default function KurbanPage() {
                               <p className="text-[10px] font-bold text-slate-400 uppercase tracking-tight leading-none mb-1">Panitia</p>
                               <p className="text-sm font-bold text-slate-900 truncate">Heru Bawono</p>
                               <p className={cn("text-xs font-bold", currentTheme?.primary)}>0813-3073-9337</p>
-                            </div>
-                          </button>
-                          <button
-                            onClick={() => openWA("6281325956533", `Assamu'alaikum Mas Aan, saya ingin mendaftar kurban ${activeModal === 'mandiri' ? 'Sapi Mandiri' : 'Kambing'}.`)}
-                            className={cn("flex items-center gap-4 p-4 bg-white border rounded-2xl hover:shadow-lg transition-all text-left group/btn", currentTheme?.border)}
-                          >
-                            <div className={cn("w-10 h-10 rounded-xl flex items-center justify-center shrink-0 transition-colors", currentTheme?.light, `group-hover/btn:${currentTheme?.bg}`)}>
-                              <MessageCircle className={cn("w-5 h-5 transition-colors", currentTheme?.primary, "group-hover/btn:text-white")} />
-                            </div>
-                            <div className="flex-1 min-w-0">
-                              <p className="text-[10px] font-bold text-slate-400 uppercase tracking-tight leading-none mb-1">Panitia</p>
-                              <p className="text-sm font-bold text-slate-900 truncate">Aan Prihantoro</p>
-                              <p className={cn("text-xs font-bold", currentTheme?.primary)}>0813-2595-6533</p>
                             </div>
                           </button>
                         </div>
