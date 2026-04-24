@@ -50,6 +50,7 @@ export default defineSchema({
     nama: v.string(),
     koordinator: v.string(),
     anggota: v.array(v.string()),
+    jobDesc: v.optional(v.string()),
   }),
   /**
    * Tabel galeri: Foto & Video kegiatan

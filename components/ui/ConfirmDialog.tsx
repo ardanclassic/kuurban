@@ -31,7 +31,7 @@ export default function ConfirmDialog({
             exit={{ opacity: 0 }}
             transition={{ duration: 0.15 }}
             onClick={onCancel}
-            className="fixed inset-0 z-[500] bg-black/40 backdrop-blur-sm"
+            className="fixed inset-0 z-[600] bg-black/40 backdrop-blur-sm"
           />
 
           {/* Dialog */}
@@ -40,7 +40,7 @@ export default function ConfirmDialog({
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.9, y: 20 }}
             transition={{ duration: 0.2, ease: [0.22, 1, 0.36, 1] }}
-            className="fixed inset-0 z-[501] flex items-center justify-center px-6 pointer-events-none"
+            className="fixed inset-0 z-[601] flex items-center justify-center px-6 pointer-events-none"
           >
             <div className="bg-white rounded-3xl shadow-2xl shadow-slate-900/20 w-full max-w-sm p-6 pointer-events-auto">
               {/* Icon */}

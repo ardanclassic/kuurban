@@ -47,13 +47,13 @@ export const removePengurus = mutation({
   },
 });
 
-// ── DIVISI PANITIA MUTATIONS ─────────────────────────────
-
+// Create a new division with optional job description
 export const createDivisi = mutation({
   args: {
     nama: v.string(),
     koordinator: v.string(),
     anggota: v.array(v.string()),
+    jobDesc: v.optional(v.string()),
   },
   handler: async (ctx, args) => {
     return await ctx.db.insert("divisi_panitia", args);
@@ -66,6 +66,7 @@ export const updateDivisi = mutation({
     nama: v.string(),
     koordinator: v.string(),
     anggota: v.array(v.string()),
+    jobDesc: v.optional(v.string()),
   },
   handler: async (ctx, { id, ...fields }) => {
     await ctx.db.patch(id, fields);

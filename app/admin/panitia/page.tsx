@@ -14,119 +14,50 @@ import FullScreenLoader from "@/components/ui/FullScreenLoader";
 function DivisionCard({
   d,
   index,
-  onEdit,
-  onDelete,
+  onOpenDetail,
   isAdmin
 }: {
-  d: { _id: string, nama: string, koordinator: string, anggota: string[] };
+  d: { _id: string, nama: string, koordinator: string, anggota: string[], jobDesc?: string };
   index: number;
-  onEdit: (id: string, d: any) => void;
-  onDelete: (id: string) => void;
+  onOpenDetail: (d: any) => void;
   isAdmin: boolean;
 }) {
-  const [isExpanded, setIsExpanded] = useState(false);
-
   return (
     <motion.div
       initial={{ opacity: 0, y: 10 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true }}
-      className="group bg-white rounded-2xl border border-slate-200 shadow-sm hover:shadow-md hover:border-indigo-300 transition-all overflow-hidden"
+      onClick={() => onOpenDetail(d)}
+      className="group cursor-pointer bg-white rounded-2xl border border-slate-200 shadow-sm hover:shadow-md hover:border-indigo-300 transition-all overflow-hidden"
     >
-      <div className="flex items-stretch">
+      <div className="flex items-stretch min-h-[100px]">
         {/* Side Accent */}
-        <div className={cn(
-          "w-1.5 bg-slate-100 border-r border-slate-200 transition-colors",
-          isExpanded ? "bg-indigo-600 border-indigo-700" : "group-hover:bg-indigo-400"
-        )} />
+        <div className="w-1.5 bg-slate-100 border-r border-slate-200 group-hover:bg-indigo-400 transition-colors" />
 
-        <div className="flex-1">
-          {/* Header Area - Always Visible */}
-          <div className="p-4 md:p-5 flex flex-col gap-3">
-            <div className="flex items-start justify-between gap-2">
-              <h4 className="font-bold text-slate-900 text-sm md:text-base leading-tight">
+        <div className="flex-1 p-4 md:p-5 flex flex-col justify-between gap-3">
+          <div className="flex items-start justify-between gap-2">
+            <div className="space-y-1">
+              <h4 className="font-bold text-slate-900 text-sm md:text-base leading-tight group-hover:text-indigo-600 transition-colors">
                 {d.nama}
               </h4>
-              {isAdmin && (
-                <div className="flex items-center gap-1 shrink-0">
-                  <button onClick={() => onEdit(d._id, d)} className="p-1.5 text-slate-400 hover:text-indigo-500 transition-colors">
-                    <Edit2 className="w-3.5 h-3.5" />
-                  </button>
-                  <button onClick={() => onDelete(d._id)} className="p-1.5 text-red-400 hover:text-red-600 transition-colors">
-                    <Trash2 className="w-3.5 h-3.5" />
-                  </button>
-                </div>
-              )}
-            </div>
-
-            <div className="flex items-center gap-1.5 w-fit px-2 py-0.5 bg-slate-50 text-slate-400 rounded-md border border-slate-100">
-              <Users className="w-3 h-3" />
-              <span className="text-[10px] font-bold">{d.anggota.length + 1} Total Anggota</span>
-            </div>
-
-            <div className="flex items-center justify-between gap-4 mt-1">
-              <div className="flex flex-col gap-0.5">
-                <span className="text-[9px] font-bold text-slate-400 uppercase tracking-wider flex items-center gap-1">
-                  <Star className="w-2.5 h-2.5 text-amber-500 fill-amber-500" /> Koordinator
-                </span>
-                <p className="font-bold text-slate-800 text-xs md:text-sm uppercase tracking-tight">
-                  {d.koordinator}
-                </p>
+              <div className="flex items-center gap-1.5 w-fit px-2 py-0.5 bg-slate-50 text-slate-400 rounded-md border border-slate-100">
+                <Users className="w-3 h-3" />
+                <span className="text-[10px] font-bold">{d.anggota.length + 1} Orang</span>
               </div>
-
-              <button
-                onClick={() => setIsExpanded(!isExpanded)}
-                className={cn(
-                  "flex items-center gap-1 px-3 py-1.5 rounded-xl text-[10px] font-bold uppercase tracking-widest transition-all",
-                  isExpanded
-                    ? "bg-slate-900 text-white shadow-lg shadow-slate-900/20"
-                    : "bg-indigo-50 text-indigo-600 hover:bg-indigo-600 hover:text-white"
-                )}
-              >
-                {isExpanded ? "Tutup" : "Anggota"}
-                <ChevronDown className={cn("w-3 h-3 transition-transform duration-300", isExpanded && "rotate-180")} />
-              </button>
+            </div>
+            <div className="p-2 bg-indigo-50 text-indigo-600 rounded-xl group-hover:bg-indigo-600 group-hover:text-white transition-all">
+              <ChevronDown className="w-4 h-4 -rotate-90" />
             </div>
           </div>
 
-          {/* Members Area - Collapsible */}
-          <AnimatePresence>
-            {isExpanded && (
-              <motion.div
-                initial={{ height: 0, opacity: 0 }}
-                animate={{ height: "auto", opacity: 1 }}
-                exit={{ height: 0, opacity: 0 }}
-                className="overflow-hidden bg-slate-50/50"
-              >
-                <div className="p-5 pt-0 border-t border-slate-100 space-y-3">
-                  <div className="pt-4 flex items-center gap-2 mb-1">
-                    <div className="h-px bg-slate-200 flex-1" />
-                    <span className="text-[9px] font-bold text-slate-400 uppercase tracking-widest">Daftar Anggota</span>
-                    <div className="h-px bg-slate-200 flex-1" />
-                  </div>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                    {d.anggota.map((member, idx) => (
-                      <motion.div
-                        key={idx}
-                        initial={{ opacity: 0, x: -10 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        transition={{ delay: idx * 0.05 }}
-                        className="flex items-center gap-2 p-3 bg-white border border-slate-200 rounded-xl shadow-sm"
-                      >
-                        <div className="w-1.5 h-1.5 rounded-full bg-indigo-400" />
-                        <p className="text-xs md:text-sm font-bold text-slate-700 leading-none">
-                          {member}
-                        </p>
-                      </motion.div>
-                    ))}
-                    {d.anggota.length === 0 && (
-                      <p className="text-xs text-slate-400 italic">Belum ada anggota</p>
-                    )}
-                  </div>
-                </div>
-              </motion.div>
-            )}
-          </AnimatePresence>
+          <div className="flex flex-col gap-0.5">
+            <span className="text-[9px] font-bold text-slate-400 uppercase tracking-wider flex items-center gap-1">
+              <Star className="w-2.5 h-2.5 text-amber-500 fill-amber-500" /> Koordinator
+            </span>
+            <p className="font-bold text-slate-800 text-xs md:text-sm uppercase tracking-tight">
+              {d.koordinator}
+            </p>
+          </div>
         </div>
       </div>
     </motion.div>
@@ -160,7 +91,16 @@ export default function SusunanPanitiaPage() {
   // Modal Divisi State
   const [isDivisiModalOpen, setIsDivisiModalOpen] = useState(false);
   const [editingDivisiId, setEditingDivisiId] = useState<Id<"divisi_panitia"> | null>(null);
-  const [divisiForm, setDivisiForm] = useState<{ nama: string, koordinator: string, anggota: string[] }>({ nama: "", koordinator: "", anggota: [""] });
+  const [divisiForm, setDivisiForm] = useState<{ nama: string, koordinator: string, anggota: string[], jobDesc: string }>({ 
+    nama: "", 
+    koordinator: "", 
+    anggota: [""],
+    jobDesc: "" 
+  });
+
+  // Detail Modal State
+  const [selectedDivisi, setSelectedDivisi] = useState<any | null>(null);
+  const [isDetailOpen, setIsDetailOpen] = useState(false);
 
   // CRUD for Pengurus
   const handleOpenPengurusModal = (item?: any) => {
@@ -198,16 +138,17 @@ export default function SusunanPanitiaPage() {
   };
 
   // CRUD for Divisi
-  const handleOpenDivisiModal = (id?: string | null, item?: any) => {
+  const handleOpenDivisiModal = (item?: any) => {
     if (item) {
       setDivisiForm({
         nama: item.nama,
         koordinator: item.koordinator,
-        anggota: item.anggota.length > 0 ? [...item.anggota] : [""]
+        anggota: item.anggota.length > 0 ? [...item.anggota] : [""],
+        jobDesc: item.jobDesc || ""
       });
       setEditingDivisiId(item._id as Id<"divisi_panitia">);
     } else {
-      setDivisiForm({ nama: "", koordinator: "", anggota: [""] });
+      setDivisiForm({ nama: "", koordinator: "", anggota: [""], jobDesc: "" });
       setEditingDivisiId(null);
     }
     setIsDivisiModalOpen(true);
@@ -228,13 +169,25 @@ export default function SusunanPanitiaPage() {
         id: editingDivisiId,
         nama: divisiForm.nama,
         koordinator: divisiForm.koordinator,
-        anggota: anggotaArray
+        anggota: anggotaArray,
+        jobDesc: divisiForm.jobDesc
       });
+      // Update selected divisi if open
+      if (selectedDivisi && selectedDivisi._id === editingDivisiId) {
+        setSelectedDivisi({
+          ...selectedDivisi,
+          nama: divisiForm.nama,
+          koordinator: divisiForm.koordinator,
+          anggota: anggotaArray,
+          jobDesc: divisiForm.jobDesc
+        });
+      }
     } else {
       await createDivisi({
         nama: divisiForm.nama,
         koordinator: divisiForm.koordinator,
-        anggota: anggotaArray
+        anggota: anggotaArray,
+        jobDesc: divisiForm.jobDesc
       });
     }
     setIsDivisiModalOpen(false);
@@ -353,8 +306,10 @@ export default function SusunanPanitiaPage() {
                 key={d._id}
                 d={d as any}
                 index={i}
-                onEdit={handleOpenDivisiModal}
-                onDelete={handleDeleteDivisi}
+                onOpenDetail={(item) => {
+                  setSelectedDivisi(item);
+                  setIsDetailOpen(true);
+                }}
                 isAdmin={isAdmin}
               />
             ))}
@@ -367,7 +322,7 @@ export default function SusunanPanitiaPage() {
         {/* PENGURUS HARIAN MODAL */}
         <AnimatePresence>
           {isPengurusModalOpen && (
-            <div className="fixed inset-0 z-[300] flex items-end md:items-center justify-center p-0 md:p-6 h-[100dvh]">
+            <div className="fixed inset-0 z-[500] flex items-end md:items-center justify-center p-0 md:p-6 h-[100dvh]">
               <motion.div
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
@@ -434,7 +389,7 @@ export default function SusunanPanitiaPage() {
         {/* DIVISI MODAL */}
         <AnimatePresence>
           {isDivisiModalOpen && (
-            <div className="fixed inset-0 z-[300] flex items-end md:items-center justify-center p-0 md:p-6 h-[100dvh]">
+            <div className="fixed inset-0 z-[500] flex items-end md:items-center justify-center p-0 md:p-6 h-[100dvh]">
               <motion.div
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
@@ -522,7 +477,16 @@ export default function SusunanPanitiaPage() {
                         </button>
                       </div>
                     </div>
-                    <div className="h-4" />
+                      <div className="space-y-1.5">
+                        <label className="text-xs font-bold tracking-wide text-slate-500 uppercase">Job Description (Tupoksi)</label>
+                        <textarea
+                          className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all text-sm font-medium text-slate-900 placeholder:text-slate-400 min-h-[120px] resize-none"
+                          placeholder="Masukkan detail tugas dan tanggung jawab divisi..."
+                          value={divisiForm.jobDesc}
+                          onChange={e => setDivisiForm({ ...divisiForm, jobDesc: e.target.value })}
+                        />
+                      </div>
+                      <div className="h-4" />
                   </div>
 
                   {/* FLOATING SUBMIT BUTTON */}
@@ -532,6 +496,130 @@ export default function SusunanPanitiaPage() {
                     </button>
                   </div>
                 </form>
+              </motion.div>
+            </div>
+          )}
+        </AnimatePresence>
+
+        {/* DETAIL DIVISI MODAL (FULLSCREEN) */}
+        <AnimatePresence>
+          {isDetailOpen && selectedDivisi && (
+            <div className="fixed inset-0 z-[400] flex items-center justify-center p-0 md:p-6 h-[100dvh]">
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                className="absolute inset-0 bg-slate-950/80 backdrop-blur-xl"
+                onClick={() => setIsDetailOpen(false)}
+              />
+              <motion.div
+                initial={{ y: "100%", opacity: 0 }}
+                animate={{ y: 0, opacity: 1 }}
+                exit={{ y: "100%", opacity: 0 }}
+                className="relative w-full h-full md:max-w-3xl md:h-[90dvh] flex flex-col bg-white md:rounded-[2.5rem] shadow-2xl overflow-hidden"
+              >
+                {/* Modal Header */}
+                <div className="flex flex-col p-5 md:p-7 border-b border-slate-100 shrink-0 gap-3 md:gap-4">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2 px-3 py-1 bg-indigo-50 rounded-lg border border-indigo-100">
+                      <Briefcase className="w-3.5 h-3.5 text-indigo-600" />
+                      <span className="text-[9px] font-black text-indigo-600 uppercase tracking-[0.2em]">Detail Divisi Kerja</span>
+                    </div>
+                    <button
+                      onClick={() => setIsDetailOpen(false)}
+                      className="p-2 text-slate-400 hover:text-slate-900 hover:bg-slate-100 transition-all rounded-full"
+                    >
+                      <X className="w-6 h-6" />
+                    </button>
+                  </div>
+                  <h3 className="font-black text-slate-900 text-xl md:text-2xl leading-[1.2] px-0.5">
+                    {selectedDivisi.nama}
+                  </h3>
+                </div>
+
+                {/* Modal Content */}
+                <div className="flex-1 overflow-y-auto p-5 md:p-7 space-y-6 pb-24">
+                  {/* Coordinator & Stats */}
+                  <div className="grid grid-cols-2 gap-3">
+                    <div className="p-4 bg-slate-50 rounded-2xl border border-slate-100 flex flex-col gap-1.5">
+                      <div className="flex items-center gap-1.5">
+                        <Star className="w-3 h-3 text-amber-500 fill-amber-500" />
+                        <span className="text-[8px] font-black text-slate-400 uppercase tracking-widest">Koordinator</span>
+                      </div>
+                      <p className="font-bold text-slate-900 text-sm md:text-base truncate">{selectedDivisi.koordinator}</p>
+                    </div>
+                    <div className="p-4 bg-slate-50 rounded-2xl border border-slate-100 flex flex-col gap-1.5">
+                      <div className="flex items-center gap-1.5">
+                        <Users className="w-3 h-3 text-indigo-500" />
+                        <span className="text-[8px] font-black text-slate-400 uppercase tracking-widest">Personel</span>
+                      </div>
+                      <p className="font-bold text-slate-900 text-sm md:text-base">{selectedDivisi.anggota.length + 1} Orang</p>
+                    </div>
+                  </div>
+
+                  {/* Member List */}
+                  <section className="space-y-2.5">
+                    <div className="flex items-center gap-2 px-0.5">
+                      <Users className="w-3.5 h-3.5 text-slate-400" />
+                      <h4 className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Daftar Anggota</h4>
+                    </div>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                      {selectedDivisi.anggota.map((member: string, idx: number) => (
+                        <div key={idx} className="flex items-center gap-2.5 p-3.5 bg-slate-50 border border-slate-100 rounded-xl">
+                          <div className="w-6 h-6 rounded-lg bg-white border border-slate-200 flex items-center justify-center text-slate-400 font-bold text-[10px]">
+                            {idx + 1}
+                          </div>
+                          <p className="font-bold text-slate-700 text-xs md:text-sm">{member}</p>
+                        </div>
+                      ))}
+                      {selectedDivisi.anggota.length === 0 && (
+                        <div className="col-span-full p-6 text-center border border-dashed border-slate-200 rounded-2xl">
+                          <p className="text-slate-400 text-xs">Tidak ada anggota tambahan</p>
+                        </div>
+                      )}
+                    </div>
+                  </section>
+
+                  {/* Job Description */}
+                  <section className="space-y-2.5">
+                    <div className="flex items-center gap-2 px-0.5">
+                      <Award className="w-3.5 h-3.5 text-indigo-500" />
+                      <h4 className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Job Description</h4>
+                    </div>
+                    <div className="p-5 bg-white rounded-2xl border border-slate-200 shadow-sm min-h-[80px]">
+                      {selectedDivisi.jobDesc ? (
+                        <div className="text-slate-600 text-sm md:text-[15px] leading-relaxed whitespace-pre-line font-medium">
+                          {selectedDivisi.jobDesc}
+                        </div>
+                      ) : (
+                        <p className="text-slate-400 italic text-xs">Belum ada job description.</p>
+                      )}
+                    </div>
+                  </section>
+                </div>
+
+                {/* Footer Actions (Admin Only) */}
+                {isAdmin && (
+                  <div className="absolute bottom-0 left-0 right-0 p-4 md:p-6 flex gap-2 bg-white border-t border-slate-100">
+                    <button
+                      onClick={() => {
+                        handleOpenDivisiModal(selectedDivisi);
+                      }}
+                      className="flex-1 flex items-center justify-center gap-2 py-3.5 bg-slate-900 text-white rounded-xl font-bold text-xs hover:bg-slate-800 transition-all active:scale-95 shadow-lg shadow-slate-900/10"
+                    >
+                      <Edit2 className="w-3.5 h-3.5" /> Edit Divisi
+                    </button>
+                    <button
+                      onClick={() => {
+                        handleDeleteDivisi(selectedDivisi._id);
+                        setIsDetailOpen(false);
+                      }}
+                      className="w-12 flex items-center justify-center py-3.5 bg-red-50 text-red-500 rounded-xl font-bold hover:bg-red-500 hover:text-white transition-all active:scale-95"
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </button>
+                  </div>
+                )}
               </motion.div>
             </div>
           )}

@@ -41,7 +41,7 @@ export default function AdminDashboard() {
     { label: "Total Shohibul Qurban", value: kurbanData === undefined ? "-" : rawKurbanCount.toString(), trend: "Orang", icon: Users, color: "text-indigo-600", bg: "bg-indigo-50" },
     { label: "Total Sapi (Kelompok & Mandiri)", value: kurbanData === undefined ? "-" : countSapi.toString(), trend: "Sapi", icon: ShieldCheck, color: "text-emerald-600", bg: "bg-emerald-50" },
     { label: "Total Kambing", value: kurbanData === undefined ? "-" : countKambing.toString(), trend: "Ekor", icon: ShoppingBag, color: "text-amber-600", bg: "bg-amber-50" },
-    { label: "Total Personil Panitia", value: (pengurusData === undefined || divisiData === undefined) ? "-" : totalPanitia.toString(), trend: "Aktif", icon: Users, color: "text-rose-600", bg: "bg-rose-50" },
+    { label: "Total Panitia", value: (pengurusData === undefined || divisiData === undefined) ? "-" : totalPanitia.toString(), trend: "Aktif", icon: Users, color: "text-rose-600", bg: "bg-rose-50" },
   ];
 
   // Latest Update Rapat
