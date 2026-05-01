@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { MessageSquare, Calendar, FileText, ChevronRight, X, Info, CheckCircle2, Edit2, Trash2, Plus, GripVertical, ChevronUp, ChevronDown } from "lucide-react";
 
@@ -44,10 +44,42 @@ export default function HasilRapatPage() {
     points: [""]
   });
 
+  const [isMounted, setIsMounted] = useState(false);
+
+  useEffect(() => {
+    setIsMounted(true);
+    const savedDraft = localStorage.getItem("kuurban_rapat_draft");
+    if (savedDraft) {
+      try {
+        const parsed = JSON.parse(savedDraft);
+        // Selalu restore data agar tidak tertimpa saat useEffect autosave berjalan
+        setFormData(parsed.formData);
+        setEditingId(parsed.editingId);
+        
+        if (parsed.isFormModalOpen) {
+          setIsFormModalOpen(true);
+        }
+      } catch (e) {
+        // ignore JSON parse errors
+      }
+    }
+  }, []);
+
+  useEffect(() => {
+    if (isMounted) {
+      localStorage.setItem("kuurban_rapat_draft", JSON.stringify({
+        isFormModalOpen,
+        editingId,
+        formData
+      }));
+    }
+  }, [isFormModalOpen, editingId, formData, isMounted]);
+
   const [dragIndex, setDragIndex] = useState<number | null>(null);
   const [dragOverIndex, setDragOverIndex] = useState<number | null>(null);
   const [confirmDeleteRapat, setConfirmDeleteRapat] = useState<Id<"rapat"> | null>(null);
   const [confirmDeletePointIdx, setConfirmDeletePointIdx] = useState<number | null>(null);
+  const [isResetConfirmOpen, setIsResetConfirmOpen] = useState(false);
 
   const handleDelete = (e: React.MouseEvent, id: Id<"rapat">) => {
     e.stopPropagation();
@@ -63,6 +95,21 @@ export default function HasilRapatPage() {
 
   const handleEdit = (e: React.MouseEvent, rapat: any) => {
     e.stopPropagation();
+
+    // Cek apakah ada draft tersimpan untuk item ini
+    const savedDraft = localStorage.getItem("kuurban_rapat_draft");
+    if (savedDraft) {
+      try {
+        const parsed = JSON.parse(savedDraft);
+        if (parsed.editingId === rapat._id) {
+          setFormData(parsed.formData);
+          setEditingId(rapat._id);
+          setIsFormModalOpen(true);
+          return;
+        }
+      } catch (err) {}
+    }
+
     setFormData({
       title: rapat.title,
       date: rapat.date,
@@ -75,6 +122,20 @@ export default function HasilRapatPage() {
   };
 
   const handleOpenNew = () => {
+    // Cek apakah ada draft tersimpan untuk notulensi baru
+    const savedDraft = localStorage.getItem("kuurban_rapat_draft");
+    if (savedDraft) {
+      try {
+        const parsed = JSON.parse(savedDraft);
+        if (parsed.editingId === null) {
+          setFormData(parsed.formData);
+          setEditingId(null);
+          setIsFormModalOpen(true);
+          return;
+        }
+      } catch (err) {}
+    }
+
     setFormData({
       title: "",
       date: "",
@@ -84,6 +145,35 @@ export default function HasilRapatPage() {
     });
     setEditingId(null);
     setIsFormModalOpen(true);
+  };
+
+  const handleResetDraft = () => {
+    setIsResetConfirmOpen(true);
+  };
+
+  const confirmReset = () => {
+    setIsResetConfirmOpen(false);
+    localStorage.removeItem("kuurban_rapat_draft");
+    if (editingId && rapatData) {
+      const rapat = rapatData.find(r => r._id === editingId);
+      if (rapat) {
+        setFormData({
+          title: rapat.title,
+          date: rapat.date,
+          status: rapat.status as "Final" | "Internal" | "Draft",
+          fullDesc: rapat.fullDesc,
+          points: rapat.points.length > 0 ? [...rapat.points] : [""]
+        });
+        return;
+      }
+    }
+    setFormData({
+      title: "",
+      date: "",
+      status: "Draft",
+      fullDesc: "",
+      points: [""]
+    });
   };
 
   const handleSubmitForm = async (e: React.FormEvent) => {
@@ -110,6 +200,9 @@ export default function HasilRapatPage() {
         points: pointsArray
       })
     }
+    
+    // Clear draft and close modal
+    localStorage.removeItem("kuurban_rapat_draft");
     setIsFormModalOpen(false);
   };
 
@@ -311,17 +404,26 @@ export default function HasilRapatPage() {
                 animate={{ y: 0, opacity: 1 }}
                 exit={{ y: "100%", opacity: 0 }}
                 transition={{ type: "spring", damping: 25, stiffness: 200 }}
-                className="relative w-full h-full md:h-auto md:max-w-xl flex flex-col bg-white md:rounded-3xl shadow-2xl overflow-hidden"
+                className="relative w-full h-full md:h-auto md:max-h-[90vh] md:max-w-xl flex flex-col bg-white md:rounded-3xl shadow-2xl overflow-hidden"
               >
                 <div className="flex items-center justify-between p-4 border-b border-slate-100 shrink-0">
                   <h3 className="font-bold text-slate-900 text-lg">{editingId ? 'Edit Notulensi' : 'Notulensi Baru'}</h3>
-                  <button
-                    onClick={() => setIsFormModalOpen(false)}
-                    className="p-2 text-slate-400 hover:text-slate-600 transition-colors rounded-full hover:bg-slate-50"
-                    type="button"
-                  >
-                    <X className="w-5 h-5" />
-                  </button>
+                  <div className="flex items-center gap-2">
+                    <button
+                      onClick={handleResetDraft}
+                      className="text-[10px] sm:text-xs font-bold text-slate-500 hover:text-red-500 bg-slate-50 hover:bg-red-50 px-3 py-1.5 rounded-lg transition-colors border border-slate-100 hover:border-red-100"
+                      type="button"
+                    >
+                      Reset Form
+                    </button>
+                    <button
+                      onClick={() => setIsFormModalOpen(false)}
+                      className="p-2 text-slate-400 hover:text-slate-600 transition-colors rounded-full hover:bg-slate-50"
+                      type="button"
+                    >
+                      <X className="w-5 h-5" />
+                    </button>
+                  </div>
                 </div>
 
                 <form onSubmit={handleSubmitForm} className="flex-1 flex flex-col min-h-0 relative">
@@ -404,12 +506,17 @@ export default function HasilRapatPage() {
                               setDragIndex(null);
                               setDragOverIndex(null);
                             }}
-                            className={`flex items-start gap-2 rounded-xl transition-all ${dragOverIndex === idx && dragIndex !== idx
+                            className={`group relative flex items-start gap-2 p-1.5 bg-slate-50 border rounded-xl transition-all focus-within:bg-white focus-within:ring-2 focus-within:ring-indigo-500/20 focus-within:border-indigo-500 ${dragOverIndex === idx && dragIndex !== idx
                               ? 'ring-2 ring-indigo-400 bg-indigo-50/50'
-                              : ''
+                              : 'border-slate-200'
                               } ${dragIndex === idx ? 'opacity-40' : 'opacity-100'
                               }`}
                           >
+                            {/* Drag Handle (Desktop) */}
+                            <div className="flex flex-col items-center shrink-0 pt-2.5 pl-1 cursor-grab active:cursor-grabbing text-slate-300 hover:text-indigo-500 sm:opacity-0 sm:group-hover:opacity-100 transition-all touch-none hidden sm:flex">
+                              <GripVertical className="w-4 h-4" />
+                            </div>
+
                             {/* TEXTAREA */}
                             <textarea
                               ref={e => {
@@ -428,49 +535,29 @@ export default function HasilRapatPage() {
                                 newPoints[idx] = val;
                                 setFormData({ ...formData, points: newPoints });
                               }}
-                              onPaste={e => {
-                                const pastedText = e.clipboardData.getData('text');
-                                if (pastedText.includes('\n')) {
-                                  e.preventDefault();
-                                  const lines = pastedText.split('\n');
-                                  const cleanedLines = lines
-                                    .map(line => line.replace(/^[ \t]*([-*•]|\d+[.)])[ \t]+/, '').trim())
-                                    .filter(line => line !== "");
-
-                                  if (cleanedLines.length > 0) {
-                                    const newPoints = [...formData.points];
-                                    newPoints.splice(idx, 1, ...cleanedLines);
-                                    setFormData({ ...formData, points: newPoints });
-                                  }
-                                }
-                              }}
-                              className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all text-sm font-bold text-slate-900 placeholder:text-slate-400 placeholder:font-medium resize-none overflow-hidden"
+                              className="flex-1 w-full min-h-[40px] px-2 py-2 bg-transparent focus:outline-none resize-none overflow-hidden text-sm font-bold text-slate-900 placeholder:text-slate-400 placeholder:font-medium"
                             />
 
-                            {/* ACTION GROUP: reorder + delete */}
-                            <div className="flex flex-col items-center gap-0.5 shrink-0 pt-1">
-                              {/* Up */}
+                            {/* ACTION GROUP: inline right */}
+                            <div className="flex items-center gap-0.5 shrink-0 pt-2 pr-1 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-all">
                               <button type="button" onClick={() => swapPoints(idx, idx - 1)} disabled={idx === 0}
-                                className="p-1.5 text-slate-400 hover:text-indigo-500 disabled:opacity-20 rounded-lg transition-colors">
-                                <ChevronUp className="w-3.5 h-3.5" />
+                                className="p-1 text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-md disabled:opacity-30 transition-colors">
+                                <ChevronUp className="w-4 h-4" />
                               </button>
-                              {/* Drag (desktop) */}
-                              <div className="p-1.5 cursor-grab active:cursor-grabbing text-slate-300 hover:text-slate-500 rounded-lg touch-none hidden sm:flex">
-                                <GripVertical className="w-3.5 h-3.5" />
-                              </div>
-                              {/* Down */}
                               <button type="button" onClick={() => swapPoints(idx, idx + 1)} disabled={idx === formData.points.length - 1}
-                                className="p-1.5 text-slate-400 hover:text-indigo-500 disabled:opacity-20 rounded-lg transition-colors">
-                                <ChevronDown className="w-3.5 h-3.5" />
+                                className="p-1 text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-md disabled:opacity-30 transition-colors">
+                                <ChevronDown className="w-4 h-4" />
                               </button>
-                              {/* Delete */}
+                              
+                              <div className="w-px h-4 bg-slate-200 mx-1" />
+                              
                               <button
                                 type="button"
                                 onClick={() => setConfirmDeletePointIdx(idx)}
-                                className="p-1.5 text-red-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors mt-0.5"
+                                className="p-1 text-slate-400 hover:text-red-500 hover:bg-red-50 rounded-md transition-colors"
                                 title="Hapus poin ini"
                               >
-                                <Trash2 className="w-3.5 h-3.5" />
+                                <Trash2 className="w-4 h-4" />
                               </button>
                             </div>
                           </div>
@@ -535,6 +622,16 @@ export default function HasilRapatPage() {
             setConfirmDeletePointIdx(null);
           }}
           onCancel={() => setConfirmDeletePointIdx(null)}
+        />
+
+        {/* CONFIRM: Reset Form */}
+        <ConfirmDialog
+          isOpen={isResetConfirmOpen}
+          title="Reset Isi Form?"
+          message="Semua ketikan yang belum tersimpan akan hilang dan form akan kembali ke kondisi awal."
+          confirmLabel="Ya, Reset"
+          onConfirm={confirmReset}
+          onCancel={() => setIsResetConfirmOpen(false)}
         />
       </div>
     </>

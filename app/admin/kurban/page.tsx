@@ -20,6 +20,7 @@ export default function AdminKurbanPage() {
   // Data dari Convex
   const rawKurbanData = useQuery(api.shohibulKurban.getAll);
   const createKurban = useMutation(api.shohibulKurban.create);
+  const updateKurban = useMutation(api.shohibulKurban.update);
   const removeKurban = useMutation(api.shohibulKurban.remove);
 
   const kurbanData = rawKurbanData ? [...rawKurbanData].reverse() : [];
@@ -33,6 +34,9 @@ export default function AdminKurbanPage() {
     keterangan: ""
   });
 
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [editKurbanData, setEditKurbanData] = useState<{ id: Id<"shohibul_kurban">; nama: string; jenis: "Sapi Kelompok" | "Sapi Mandiri" | "Kambing"; kelompok: string; keterangan: string } | null>(null);
+
   const categories = ["Semua", "Sapi Kelompok", "Sapi Mandiri", "Kambing"];
 
   const filteredData = kurbanData.filter(item => {
@@ -40,6 +44,27 @@ export default function AdminKurbanPage() {
     const matchesSearch = item.nama.toLowerCase().includes(searchQuery.toLowerCase());
     return matchesFilter && matchesSearch;
   });
+
+  // Grouping logic
+  const groupedData: Record<string, typeof filteredData> = {};
+  const sapiMandiriData: typeof filteredData = [];
+  const kambingData: typeof filteredData = [];
+
+  filteredData.forEach(item => {
+    if (item.jenis === "Sapi Kelompok" && item.kelompok) {
+      if (!groupedData[item.kelompok]) {
+        groupedData[item.kelompok] = [];
+      }
+      groupedData[item.kelompok].push(item);
+    } else if (item.jenis === "Sapi Mandiri") {
+      sapiMandiriData.push(item);
+    } else if (item.jenis === "Kambing") {
+      kambingData.push(item);
+    }
+  });
+
+  // Sort groups by key (e.g., "Kelompok 1", "Kelompok 2")
+  const sortedGroupKeys = Object.keys(groupedData).sort((a, b) => a.localeCompare(b, undefined, { numeric: true, sensitivity: 'base' }));
 
   const [confirmDeleteId, setConfirmDeleteId] = useState<Id<"shohibul_kurban"> | null>(null);
 
@@ -62,10 +87,93 @@ export default function AdminKurbanPage() {
     setNewKurban({ nama: "", jenis: "Sapi Kelompok", kelompok: "Kelompok 1", keterangan: "" });
   };
 
+  const handleEditData = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!editKurbanData || !editKurbanData.nama) return;
+
+    await updateKurban({
+      id: editKurbanData.id,
+      nama: editKurbanData.nama,
+      jenis: editKurbanData.jenis,
+      kelompok: editKurbanData.jenis === "Sapi Kelompok" ? editKurbanData.kelompok : undefined,
+      keterangan: editKurbanData.keterangan || undefined
+    });
+
+    setIsEditModalOpen(false);
+    setEditKurbanData(null);
+  };
+
   const stats = {
     sapi: kurbanData.filter(d => d.jenis.includes("Sapi")).length,
     kambing: kurbanData.filter(d => d.jenis === "Kambing").length
   };
+
+  const renderItemCard = (item: typeof filteredData[0], i: number) => (
+    <motion.div
+      initial={{ opacity: 0, y: 10 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ delay: i * 0.05 }}
+      key={item._id}
+      className="bg-white p-3 md:p-4 rounded-2xl border border-slate-200 shadow-sm flex items-center gap-3 w-full min-w-0 hover:border-indigo-300 transition-all active:bg-slate-50"
+    >
+      {/* Visual Icon */}
+      <div className={cn(
+        "w-9 h-9 md:w-10 md:h-10 rounded-xl flex items-center justify-center shrink-0 shadow-inner border border-slate-100",
+        item.jenis === "Kambing" ? "bg-amber-50 text-amber-600" : "bg-indigo-50 text-indigo-600"
+      )}>
+        <span className="font-bold text-sm md:text-base">{item.jenis === "Kambing" ? "🐐" : "🐄"}</span>
+      </div>
+
+      {/* Content Area - Full Name & Status */}
+      <div className="flex-1 min-w-0 py-0.5">
+        <h4 className="font-bold text-slate-900 text-sm md:text-[15px] leading-tight mb-1.5 flex items-center gap-2">
+          {item.nama}
+        </h4>
+        <div className="flex flex-wrap items-center gap-2">
+          <span className="text-[10px] md:text-[11px] font-bold text-slate-400 border border-slate-100 rounded-md px-2 py-0.5 uppercase tracking-tight">
+            {item.jenis}
+          </span>
+          {item.kelompok && item.jenis === "Sapi Kelompok" && (
+            <span className="text-[10px] md:text-[11px] font-bold text-indigo-600 bg-indigo-50 px-2 py-0.5 rounded-md uppercase tracking-tight">
+              {item.kelompok}
+            </span>
+          )}
+          {item.keterangan && (
+            <div className="text-[10px] md:text-[11px] italic font-medium text-slate-400 mt-0.5 whitespace-pre-line">
+              {item.keterangan}
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* Action Buttons */}
+      {isAdmin && (
+        <div className="flex items-center gap-1 shrink-0 ml-auto pl-2 border-l border-slate-50">
+          <button
+            onClick={() => {
+              setEditKurbanData({
+                id: item._id,
+                nama: item.nama,
+                jenis: item.jenis,
+                kelompok: item.kelompok || "Kelompok 1",
+                keterangan: item.keterangan || ""
+              });
+              setIsEditModalOpen(true);
+            }}
+            className="p-2 text-indigo-400 hover:text-indigo-600 transition-colors"
+          >
+            <Edit2 className="w-5 h-5" />
+          </button>
+          <button
+            onClick={() => handleDelete(item._id)}
+            className="p-2 text-red-400 hover:text-red-500 transition-colors"
+          >
+            <Trash2 className="w-5 h-5" />
+          </button>
+        </div>
+      )}
+    </motion.div>
+  );
 
   return (
     <>
@@ -148,63 +256,71 @@ export default function AdminKurbanPage() {
         </div>
 
         {/* DATA CARDS - ROBUST WIDTH CONTROL */}
-        <div className="grid grid-cols-1 gap-3 w-full">
+        <div className="space-y-6 w-full">
           {rawKurbanData === undefined ? (
             <div className="py-20 text-center">
               <p className="text-slate-400 font-bold text-sm animate-pulse">Memuat data...</p>
             </div>
           ) : filteredData.length > 0 ? (
-            filteredData.map((item, i) => (
-              <motion.div
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: i * 0.05 }}
-                key={item._id}
-                className="bg-white p-3 md:p-4 rounded-2xl border border-slate-200 shadow-sm flex items-center gap-3 w-full min-w-0 hover:border-indigo-300 transition-all active:bg-slate-50"
-              >
-                {/* Visual Icon */}
-                <div className={cn(
-                  "w-9 h-9 md:w-10 md:h-10 rounded-xl flex items-center justify-center shrink-0 shadow-inner border border-slate-100",
-                  item.jenis === "Kambing" ? "bg-amber-50 text-amber-600" : "bg-indigo-50 text-indigo-600"
-                )}>
-                  <span className="font-bold text-sm md:text-base">{item.jenis === "Kambing" ? "🐐" : "🐄"}</span>
-                </div>
-
-                {/* Content Area - Full Name & Status */}
-                <div className="flex-1 min-w-0 py-0.5">
-                  <h4 className="font-bold text-slate-900 text-sm md:text-[15px] leading-tight mb-1.5 flex items-center gap-2">
-                    {item.nama}
-                  </h4>
-                  <div className="flex flex-wrap items-center gap-2">
-                    <span className="text-[10px] md:text-[11px] font-bold text-slate-400 border border-slate-100 rounded-md px-2 py-0.5 uppercase tracking-tight">
-                      {item.jenis}
-                    </span>
-                    {item.kelompok && (
-                      <span className="text-[10px] md:text-[11px] font-bold text-indigo-600 bg-indigo-50 px-2 py-0.5 rounded-md uppercase tracking-tight">
-                        {item.kelompok}
-                      </span>
-                    )}
-                    {item.keterangan && (
-                      <div className="text-[10px] md:text-[11px] italic font-medium text-slate-400 mt-0.5 whitespace-pre-line">
-                        {item.keterangan}
+            <>
+              {/* GROUPS - SAPI KELOMPOK */}
+              {sortedGroupKeys.length > 0 && (
+                <div className="space-y-6">
+                  {sortedGroupKeys.map((groupKey) => (
+                    <div key={groupKey} className="bg-indigo-50/60 border border-indigo-100 rounded-[1.5rem] p-4 md:p-5 shadow-sm space-y-4">
+                      <div className="flex items-center justify-between px-1">
+                        <h3 className="text-sm font-black text-slate-800 uppercase tracking-widest flex items-center gap-2.5">
+                          <span className="w-2 h-2 rounded-full bg-indigo-500 animate-pulse" />
+                          Sapi {groupKey}
+                        </h3>
+                        <span className="text-[10px] font-bold text-slate-500 bg-slate-100 px-2.5 py-1 rounded-md">
+                          {groupedData[groupKey].length} Orang
+                        </span>
                       </div>
-                    )}
+                      <div className="grid grid-cols-1 gap-3">
+                        {groupedData[groupKey].map((item, i) => renderItemCard(item, i))}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              {/* INDIVIDUAL ITEMS - SAPI MANDIRI */}
+              {sapiMandiriData.length > 0 && (
+                <div className="bg-emerald-50/60 border border-emerald-100 rounded-[1.5rem] p-4 md:p-5 shadow-sm space-y-4 mt-6">
+                  <div className="flex items-center justify-between px-1">
+                    <h3 className="text-sm font-black text-slate-800 uppercase tracking-widest flex items-center gap-2.5">
+                      <span className="w-2 h-2 rounded-full bg-emerald-500" />
+                      Sapi Mandiri
+                    </h3>
+                    <span className="text-[10px] font-bold text-slate-500 bg-slate-100 px-2.5 py-1 rounded-md">
+                      {sapiMandiriData.length} Orang
+                    </span>
+                  </div>
+                  <div className="grid grid-cols-1 gap-3">
+                    {sapiMandiriData.map((item, i) => renderItemCard(item, i))}
                   </div>
                 </div>
+              )}
 
-                {/* Action Buttons */}
-                {isAdmin && (
-                  <div className="flex items-center gap-1 shrink-0 ml-auto pl-2 border-l border-slate-50">
-                    <button
-                      onClick={() => handleDelete(item._id)}
-                      className="p-2 text-red-400 hover:text-red-500 transition-colors"
-                    >
-                      <Trash2 className="w-5 h-5" />
-                    </button>
+              {/* INDIVIDUAL ITEMS - KAMBING */}
+              {kambingData.length > 0 && (
+                <div className="bg-amber-50/60 border border-amber-100 rounded-[1.5rem] p-4 md:p-5 shadow-sm space-y-4 mt-6">
+                  <div className="flex items-center justify-between px-1">
+                    <h3 className="text-sm font-black text-slate-800 uppercase tracking-widest flex items-center gap-2.5">
+                      <span className="w-2 h-2 rounded-full bg-amber-500" />
+                      Kambing
+                    </h3>
+                    <span className="text-[10px] font-bold text-slate-500 bg-slate-100 px-2.5 py-1 rounded-md">
+                      {kambingData.length} Orang
+                    </span>
                   </div>
-                )}
-              </motion.div>
-            ))
+                  <div className="grid grid-cols-1 gap-3">
+                    {kambingData.map((item, i) => renderItemCard(item, i))}
+                  </div>
+                </div>
+              )}
+            </>
           ) : (
             <div className="py-20 text-center">
               <p className="text-slate-400 font-bold text-sm">Data tidak ditemukan.</p>
@@ -319,6 +435,112 @@ export default function AdminKurbanPage() {
           )}
         </AnimatePresence>
 
+        {/* EDIT MODAL */}
+        <AnimatePresence>
+          {isEditModalOpen && editKurbanData && (
+            <div className="fixed inset-0 z-[300] flex items-end md:items-center justify-center p-0 md:p-6 h-[100dvh]">
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm"
+                onClick={() => {
+                  setIsEditModalOpen(false);
+                  setEditKurbanData(null);
+                }}
+              />
+              <motion.div
+                initial={{ y: "100%", opacity: 0 }}
+                animate={{ y: 0, opacity: 1 }}
+                exit={{ y: "100%", opacity: 0 }}
+                transition={{ type: "spring", damping: 25, stiffness: 200 }}
+                className="relative w-full h-full md:h-auto md:max-w-md flex flex-col bg-white md:rounded-3xl shadow-2xl overflow-hidden"
+              >
+                <div className="flex items-center justify-between p-4 border-b border-slate-100 shrink-0">
+                  <h3 className="font-bold text-slate-900 text-lg">Edit Shohibul Kurban</h3>
+                  <button
+                    onClick={() => {
+                      setIsEditModalOpen(false);
+                      setEditKurbanData(null);
+                    }}
+                    className="p-2 text-slate-400 hover:text-slate-600 transition-colors rounded-full hover:bg-slate-50"
+                    type="button"
+                  >
+                    <X className="w-5 h-5" />
+                  </button>
+                </div>
+
+                <form onSubmit={handleEditData} className="flex-1 flex flex-col min-h-0 relative">
+                  <div className="flex-1 overflow-y-auto p-4 pb-28 space-y-5">
+                    <div className="space-y-1.5">
+                      <label className="text-xs font-bold tracking-wide text-slate-500 uppercase">Nama Lengkap</label>
+                      <input
+                        type="text"
+                        required
+                        className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all text-sm font-bold text-slate-900 placeholder:text-slate-400 placeholder:font-medium"
+                        placeholder="Contoh: Bpk. Budi - RT 01"
+                        value={editKurbanData.nama}
+                        onChange={e => setEditKurbanData({ ...editKurbanData, nama: e.target.value })}
+                      />
+                    </div>
+
+                    <div className="space-y-1.5">
+                      <label className="text-xs font-bold tracking-wide text-slate-500 uppercase">Jenis Kurban</label>
+                      <select
+                        className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all text-sm font-bold text-slate-900 appearance-none"
+                        value={editKurbanData.jenis}
+                        onChange={e => setEditKurbanData({ ...editKurbanData, jenis: e.target.value as "Sapi Kelompok" | "Sapi Mandiri" | "Kambing" })}
+                      >
+                        <option value="Sapi Kelompok">Sapi Kelompok</option>
+                        <option value="Sapi Mandiri">Sapi Mandiri</option>
+                        <option value="Kambing">Kambing</option>
+                      </select>
+                    </div>
+
+                    {editKurbanData.jenis === "Sapi Kelompok" && (
+                      <div className="space-y-1.5">
+                        <label className="text-xs font-bold tracking-wide text-slate-500 uppercase">Kelompok</label>
+                        <input
+                          type="text"
+                          required
+                          className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all text-sm font-bold text-slate-900 placeholder:text-slate-400 placeholder:font-medium"
+                          placeholder="Contoh: Kelompok 1"
+                          value={editKurbanData.kelompok}
+                          onChange={e => setEditKurbanData({ ...editKurbanData, kelompok: e.target.value })}
+                        />
+                      </div>
+                    )}
+
+
+
+                    <div className="space-y-1.5">
+                      <label className="text-xs font-bold tracking-wide text-slate-500 uppercase">Keterangan (Opsional)</label>
+                      <input
+                        type="text"
+                        className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all text-sm font-bold text-slate-900 placeholder:text-slate-400 placeholder:font-medium"
+                        placeholder="Contoh: Atas nama alm. H. Salim"
+                        value={editKurbanData.keterangan}
+                        onChange={e => setEditKurbanData({ ...editKurbanData, keterangan: e.target.value })}
+                      />
+                    </div>
+                    <div className="h-4" />
+                  </div>
+
+                  {/* FLOATING SUBMIT BUTTON */}
+                  <div className="absolute bottom-0 left-0 right-0 p-4 pt-10 pointer-events-none z-10 bg-gradient-to-t from-white via-white/80 to-transparent">
+                    <button
+                      type="submit"
+                      className="w-full pointer-events-auto bg-indigo-600 text-white py-3.5 rounded-xl font-bold flex items-center justify-center gap-2 shadow-xl shadow-indigo-600/30 ring-1 ring-white/20 active:scale-95 transition-all text-sm"
+                    >
+                      <Edit2 className="w-4 h-4" /> Simpan Perubahan
+                    </button>
+                  </div>
+                </form>
+              </motion.div>
+            </div>
+          )}
+        </AnimatePresence>
+
         <ConfirmDialog
           isOpen={confirmDeleteId !== null}
           title="Hapus Data Shohibul Kurban"
@@ -333,3 +555,4 @@ export default function AdminKurbanPage() {
     </>
   );
 }
+
