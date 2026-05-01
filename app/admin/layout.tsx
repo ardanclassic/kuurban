@@ -25,9 +25,14 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
   const SidebarContent = () => (
     <div className="flex flex-col h-full">
       <div className="p-6 border-b border-indigo-900 mb-4 flex items-center justify-between">
-        <div>
-          <h2 className="text-xl font-bold text-white tracking-tight">Admin Kurban</h2>
-          <p className="text-indigo-400 text-[10px] font-bold uppercase tracking-widest mt-1">Dashboard {role}</p>
+        <div className="flex items-center gap-3">
+          <div className="w-11 h-11 flex items-center justify-center shrink-0">
+            <img src="/logo-3.png" alt="Logo" className="w-full h-full object-contain" />
+          </div>
+          <div>
+            <h2 className="text-lg font-bold text-white tracking-tight leading-none">Admin Kurban</h2>
+            <p className="text-indigo-400 text-[9px] font-bold uppercase tracking-widest mt-1">Dashboard {role}</p>
+          </div>
         </div>
         <button onClick={() => setIsSidebarOpen(false)} className="md:hidden p-2 text-indigo-400">
           <X className="w-6 h-6" />

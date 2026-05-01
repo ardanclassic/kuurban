@@ -17,6 +17,10 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "Kuurban - Musala Al Ukhuwah",
   description: "Portal Info & Pendaftaran Kurban Musala Al Ukhuwah",
+  icons: {
+    icon: "/icon.png",
+    apple: "/icon.png",
+  },
 };
 
 export default function RootLayout({

@@ -31,8 +31,8 @@ export default function PublicNavbar() {
       <header className="sticky top-0 z-40 w-full bg-white/90 border-b border-indigo-900/10 backdrop-blur-md">
         <div className="max-w-4xl mx-auto px-4 h-16 sm:h-20 flex items-center justify-between">
           <Link href="/" className="flex items-center gap-3 relative z-[60]">
-            <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-indigo-50 border border-indigo-100 flex items-center justify-center shadow-sm">
-              <span className="text-xl sm:text-2xl">🐐</span>
+            <div className="w-10 h-10 sm:w-12 sm:h-12 flex items-center justify-center shrink-0">
+              <img src="/logo-3.png" alt="Logo" className="w-full h-full object-contain" />
             </div>
             <div className="flex flex-col">
               <span className="font-bold text-lg sm:text-xl text-indigo-950 leading-tight">Kuurban</span>
@@ -107,8 +107,8 @@ export default function PublicNavbar() {
             {/* Close Button + Logo Row */}
             <div className="flex items-center justify-between pt-5 pb-8 relative z-10">
               <Link href="/" onClick={() => setIsOpen(false)} className="flex items-center gap-3">
-                <div className="w-9 h-9 rounded-xl bg-indigo-50 border border-indigo-100 flex items-center justify-center shadow-sm">
-                  <span className="text-xl">🐐</span>
+                <div className="w-10 h-10 flex items-center justify-center shrink-0">
+                  <img src="/logo-3.png" alt="Logo" className="w-full h-full object-contain" />
                 </div>
                 <div className="flex flex-col">
                   <span className="font-bold text-lg text-indigo-950 leading-tight">Kuurban</span>

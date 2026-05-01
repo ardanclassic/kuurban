@@ -13,8 +13,8 @@ export default function PublicFooter() {
         {/* BRAND COLUMN */}
         <div className="col-span-1 md:col-span-5 space-y-6">
           <div className="flex items-center gap-4">
-            <div className="w-12 h-12 rounded-xl bg-white/10 border border-white/20 backdrop-blur-sm flex items-center justify-center shadow-lg">
-              <span className="text-2xl">🐐</span>
+            <div className="w-14 h-14 flex items-center justify-center shrink-0">
+              <img src="/logo-3.png" alt="Logo" className="w-full h-full object-contain" />
             </div>
             <div>
               <span className="font-extrabold text-2xl text-white block tracking-tight">Kuurban</span>

@@ -44,7 +44,7 @@ export default function HomePage() {
             <span className="relative inline-flex rounded-full h-2 w-2 bg-amber-500"></span>
           </span>
           PENDAFTARAN DIBUKA
-          <span>🐐</span>
+          <img src="/logo-3.png" alt="Logo" className="w-5 h-5 object-contain animate-bounce drop-shadow-sm" />
         </motion.div>
 
         <div className="space-y-4 md:space-y-6">
