@@ -55,7 +55,7 @@ export default function NotulensiDetailPage() {
 
   // Back href: panitia admin if logged in, else beranda
   const backHref = isAdmin ? "/admin/rapat" : "/";
-  const backLabel = isAdmin ? "Kembali ke Notulensi" : "Kembali ke Beranda";
+  const backLabel = isAdmin ? "Kembali" : "Kembali ke Beranda";
 
   const rapat = useQuery(
     api.rapat.getById,
@@ -130,97 +130,104 @@ export default function NotulensiDetailPage() {
           </Link>
         </motion.div>
 
-        {/* ── Single main card ── */}
+        {/* ── Header — bare on background ── */}
         <motion.div
-          initial={{ opacity: 0, y: 14 }}
+          initial={{ opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.35 }}
-          className="bg-white border border-amber-200 rounded-2xl shadow-sm overflow-hidden"
+          className="mb-5"
         >
-
-          {/* ── Header section ── */}
-          <div className="px-4 sm:px-6 pt-5 pb-4 border-b border-amber-100">
-            <div className="flex items-center gap-1.5 mb-2.5">
-              <span className="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse shrink-0" />
-              <span className="text-[9px] font-black text-amber-600 uppercase tracking-[0.18em]">
-                Notulensi Rapat
-              </span>
-            </div>
-
-            <h1 className="text-lg sm:text-xl font-black text-stone-900 leading-snug mb-3 break-words">
-              {rapat.title}
-            </h1>
-
-            <div className="flex flex-wrap items-center gap-2">
-              <div className="flex items-center gap-1.5 text-stone-500 text-xs font-medium">
-                <Calendar className="w-3.5 h-3.5 text-amber-500 shrink-0" />
-                <span>{rapat.date}</span>
-              </div>
-              <div className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-md border text-[10px] font-black uppercase tracking-wide ${status.bg} ${status.text} ${status.border}`}>
-                <span className={`w-1.5 h-1.5 rounded-full shrink-0 ${status.dot}`} />
-                {status.label}
-              </div>
-            </div>
+          <div className="flex items-center gap-1.5 mb-2">
+            <span className="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse shrink-0" />
+            <span className="text-[9px] font-black text-amber-600 uppercase tracking-[0.18em]">
+              Notulensi Rapat
+            </span>
           </div>
 
-          {/* ── Description section ── */}
-          {rapat.fullDesc && (
-            <div className="px-4 sm:px-6 py-4 border-b border-amber-100">
-              <h2 className="text-[9px] font-black text-stone-400 uppercase tracking-widest mb-2">
-                Deskripsi Rapat
-              </h2>
+          <h1 className="text-xl sm:text-2xl font-black text-stone-900 leading-snug mb-3 break-words">
+            {rapat.title}
+          </h1>
+
+          <div className="flex flex-wrap items-center gap-2">
+            <div className="flex items-center gap-1.5 text-stone-500 text-xs font-medium">
+              <Calendar className="w-3.5 h-3.5 text-amber-500 shrink-0" />
+              <span>{rapat.date}</span>
+            </div>
+            <div className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-md border text-[10px] font-black uppercase tracking-wide ${status.bg} ${status.text} ${status.border}`}>
+              <span className={`w-1.5 h-1.5 rounded-full shrink-0 ${status.dot}`} />
+              {status.label}
+            </div>
+          </div>
+        </motion.div>
+
+        {/* ── Description section ── */}
+        {rapat.fullDesc && (
+          <motion.div
+            initial={{ opacity: 0, y: 12 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.35, delay: 0.1 }}
+            className="mb-8"
+          >
+            <h2 className="text-[11px] font-black text-amber-700 uppercase tracking-[0.2em] mb-2.5 px-1 flex items-center gap-2">
+              <div className="w-4 h-[2px] bg-amber-400 rounded-full" />
+              Deskripsi Rapat
+            </h2>
+            <div className="bg-white border border-amber-200 rounded-2xl p-4 sm:p-5 shadow-sm">
               <p className="text-xs sm:text-sm text-stone-700 font-medium leading-relaxed whitespace-pre-line break-words">
                 {rapat.fullDesc}
               </p>
             </div>
-          )}
+          </motion.div>
+        )}
 
-          {/* ── Points section ── */}
-          {rapat.points.length > 0 && (
-            <div className="px-4 sm:px-6 py-4">
-              <div className="flex items-center justify-between mb-3">
-                <h2 className="text-[9px] font-black text-stone-400 uppercase tracking-widest">
-                  Hasil Musyawarah
-                </h2>
-                <span className="text-[9px] font-bold text-stone-400 bg-amber-50 border border-amber-200 px-2 py-0.5 rounded-md">
-                  {rapat.points.length} Poin
-                </span>
-              </div>
-
-              <div className="space-y-2">
-                {rapat.points.map((point, idx) => (
-                  <motion.div
-                    key={idx}
-                    initial={{ opacity: 0, x: -6 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ delay: 0.15 + idx * 0.05 }}
-                    className="flex items-start gap-3 bg-amber-50 border border-amber-100 rounded-xl p-3"
-                  >
-                    <div className="w-6 h-6 rounded-lg bg-emerald-100 border border-emerald-200 flex items-center justify-center shrink-0 mt-0.5">
-                      <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <span className="block text-[8px] font-black text-stone-400 uppercase tracking-widest mb-0.5">
-                        Poin {idx + 1}
-                      </span>
-                      <p className="text-xs sm:text-sm text-stone-800 font-semibold leading-relaxed whitespace-pre-line break-words">
-                        {point}
-                      </p>
-                    </div>
-                  </motion.div>
-                ))}
-              </div>
+        {/* ── Points section ── */}
+        {rapat.points.length > 0 && (
+          <div className="space-y-4">
+            {/* Header */}
+            <div className="flex items-center justify-between mb-3 px-1">
+              <h2 className="text-[11px] font-black text-amber-700 uppercase tracking-[0.2em] flex items-center gap-2">
+                <div className="w-4 h-[2px] bg-amber-400 rounded-full" />
+                Hasil Musyawarah
+              </h2>
+              <span className="text-[10px] font-bold text-amber-700 bg-amber-100 border border-amber-200 px-2.5 py-0.5 rounded-lg">
+                {rapat.points.length} Poin
+              </span>
             </div>
-          )}
 
-        </motion.div>
+            <div className="space-y-3">
+              {rapat.points.map((point, idx) => (
+                <motion.div
+                  key={idx}
+                  initial={{ opacity: 0, x: -6 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: 0.15 + idx * 0.05 }}
+                  className="relative bg-white border border-amber-200 rounded-2xl p-4 sm:p-5 shadow-sm overflow-hidden"
+                >
+                  {/* More visible icon in corner */}
+                  <div className="absolute top-4 right-4 opacity-30">
+                    <CheckCircle2 className="w-6 h-6 text-emerald-600" />
+                  </div>
+
+                  <div className="relative z-10 min-w-0">
+                    <span className="block text-[8px] font-black text-amber-600 uppercase tracking-widest mb-2 opacity-80">
+                      Poin {idx + 1}
+                    </span>
+                    <p className="text-xs sm:text-sm text-stone-800 font-bold leading-relaxed whitespace-pre-line break-words pr-6">
+                      {point}
+                    </p>
+                  </div>
+                </motion.div>
+              ))}
+            </div>
+          </div>
+        )}
 
         {/* ── Footer ── */}
         <motion.footer
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.45 }}
-          className="text-center mt-6 pb-8 space-y-0.5"
+          className="text-center mt-4 pb-8"
         >
           <p className="text-[9px] font-bold text-stone-400 uppercase tracking-widest">
             Al Ukhuwah · Idul Adha 1447 H
