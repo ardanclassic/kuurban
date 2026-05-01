@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Briefcase, Users, Star, Award, ChevronDown, Edit2, Trash2, Plus, X } from "lucide-react";
+import { Briefcase, Users, Star, Award, ChevronDown, Edit2, Trash2, Plus, X, Route } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useQuery, useMutation } from "convex/react";
 import { api } from "@/convex/_generated/api";
@@ -10,6 +10,7 @@ import { Id } from "@/convex/_generated/dataModel";
 import ConfirmDialog from "@/components/ui/ConfirmDialog";
 import { useAuth } from "@/lib/auth-context";
 import FullScreenLoader from "@/components/ui/FullScreenLoader";
+import WorkflowDiagram from "@/components/WorkflowDiagram";
 
 function DivisionCard({
   d,
@@ -67,6 +68,7 @@ function DivisionCard({
 export default function SusunanPanitiaPage() {
   const { role } = useAuth();
   const isAdmin = role === "admin";
+  const [activeTab, setActiveTab] = useState<'struktur' | 'alur'>('alur');
   const pengurusData = useQuery(api.panitia.getPengurusHarian);
   const divisiData = useQuery(api.panitia.getDivisiPanitia);
   const isLoading = pengurusData === undefined || divisiData === undefined;
@@ -91,11 +93,11 @@ export default function SusunanPanitiaPage() {
   // Modal Divisi State
   const [isDivisiModalOpen, setIsDivisiModalOpen] = useState(false);
   const [editingDivisiId, setEditingDivisiId] = useState<Id<"divisi_panitia"> | null>(null);
-  const [divisiForm, setDivisiForm] = useState<{ nama: string, koordinator: string, anggota: string[], jobDesc: string }>({ 
-    nama: "", 
-    koordinator: "", 
+  const [divisiForm, setDivisiForm] = useState<{ nama: string, koordinator: string, anggota: string[], jobDesc: string }>({
+    nama: "",
+    koordinator: "",
     anggota: [""],
-    jobDesc: "" 
+    jobDesc: ""
   });
 
   // Detail Modal State
@@ -230,94 +232,130 @@ export default function SusunanPanitiaPage() {
           </div>
         </div>
 
-        {/* CORE COMMITTEE / PENGURUS HARIAN */}
-        <section className="space-y-4">
-          <div className="flex items-center justify-between px-1">
-            <div className="flex items-center gap-2">
-              <div className="w-1.5 h-4 bg-emerald-500 rounded-full" />
-              <h3 className="text-xs font-bold text-slate-500 uppercase tracking-[0.2em]">Pengurus Harian</h3>
-            </div>
-            {isAdmin && (
-              <button
-                onClick={() => handleOpenPengurusModal()}
-                className="flex items-center gap-1.5 px-3 py-1.5 bg-indigo-50 text-indigo-600 rounded-lg text-xs font-bold hover:bg-indigo-100 transition-colors"
-              >
-                <Plus className="w-3.5 h-3.5" /> Tambah Pengurus
-              </button>
+        {/* TAB NAVIGATION */}
+        <div className="flex items-center p-1.5 bg-slate-200/60 backdrop-blur-md rounded-2xl w-fit">
+          <button
+            onClick={() => setActiveTab('struktur')}
+            className={cn(
+              "flex items-center gap-2 px-5 md:px-8 py-2.5 rounded-xl font-bold text-[13px] md:text-sm transition-all",
+              activeTab === 'struktur' ? "bg-white text-indigo-600 shadow-sm ring-1 ring-black/5" : "text-slate-500 hover:text-slate-700 hover:bg-slate-200/50"
             )}
-          </div>
+          >
+            <Users className="w-4 h-4" />
+            Struktur
+          </button>
+          <button
+            onClick={() => setActiveTab('alur')}
+            className={cn(
+              "flex items-center gap-2 px-5 md:px-8 py-2.5 rounded-xl font-bold text-[13px] md:text-sm transition-all",
+              activeTab === 'alur' ? "bg-white text-indigo-600 shadow-sm ring-1 ring-black/5" : "text-slate-500 hover:text-slate-700 hover:bg-slate-200/50"
+            )}
+          >
+            <Route className="w-4 h-4" />
+            Alur Kerja
+          </button>
+        </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
-            {pengurusData === undefined ? (
-              <p className="text-sm font-medium text-slate-400 col-span-full py-4 px-2 animate-pulse">Memuat data pengurus harian...</p>
-            ) : pengurusData.map((p) => (
-              <motion.div
-                key={p._id}
-                initial={{ opacity: 0, y: 5 }}
-                animate={{ opacity: 1, y: 0 }}
-                className="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm group hover:border-indigo-300 hover:shadow-md transition-all flex flex-col gap-3"
-              >
-                <div className="flex items-start justify-between gap-4">
-                  <div className="flex-1 min-w-0">
-                    <p className="text-[9px] font-bold text-indigo-500 uppercase tracking-widest mb-1.5">{p.jabatan}</p>
-                    <h4 className="font-bold text-slate-900 text-sm md:text-[15px] leading-snug break-words">{p.nama}</h4>
-                  </div>
-                  {isAdmin && (
-                    <div className="flex items-center gap-1 shrink-0 opacity-100 sm:opacity-0 group-hover:opacity-100 transition-opacity">
-                      <button onClick={() => handleOpenPengurusModal(p)} className="p-1.5 bg-slate-50 text-slate-500 hover:text-indigo-600 hover:bg-indigo-50 rounded-lg transition-colors">
-                        <Edit2 className="w-3.5 h-3.5" />
-                      </button>
-                      <button onClick={() => handleDeletePengurus(p._id)} className="p-1.5 bg-slate-50 text-slate-500 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors">
-                        <Trash2 className="w-3.5 h-3.5" />
-                      </button>
-                    </div>
-                  )}
+        {activeTab === 'struktur' ? (
+          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-6 md:space-y-8">
+            {/* CORE COMMITTEE / PENGURUS HARIAN */}
+            <section className="space-y-4">
+              <div className="flex items-center justify-between px-1">
+                <div className="flex items-center gap-2">
+                  <div className="w-1.5 h-4 bg-emerald-500 rounded-full" />
+                  <h3 className="text-xs font-bold text-slate-500 uppercase tracking-[0.2em]">Pengurus Harian</h3>
                 </div>
-              </motion.div>
-            ))}
-            {pengurusData && pengurusData.length === 0 && (
-              <p className="text-sm font-medium text-slate-400 col-span-full py-4 px-2">Belum ada pengurus harian</p>
-            )}
-          </div>
-        </section>
+                {isAdmin && (
+                  <button
+                    onClick={() => handleOpenPengurusModal()}
+                    className="flex items-center gap-1.5 px-3 py-1.5 bg-indigo-50 text-indigo-600 rounded-lg text-xs font-bold hover:bg-indigo-100 transition-colors"
+                  >
+                    <Plus className="w-3.5 h-3.5" /> Tambah Pengurus
+                  </button>
+                )}
+              </div>
 
-        {/* DIVISI DIVISI */}
-        <section className="space-y-4 pt-4">
-          <div className="flex items-center justify-between px-1">
-            <div className="flex items-center gap-2">
-              <div className="w-1.5 h-4 bg-indigo-600 rounded-full" />
-              <h3 className="text-xs font-bold text-slate-500 uppercase tracking-[0.2em]">Struktur Divisi Kerja</h3>
-            </div>
-            {isAdmin && (
-              <button
-                onClick={() => handleOpenDivisiModal(null)}
-                className="flex items-center gap-1.5 px-3 py-1.5 bg-indigo-50 text-indigo-600 rounded-lg text-xs font-bold hover:bg-indigo-100 transition-colors"
-              >
-                <Plus className="w-3.5 h-3.5" /> Tambah Divisi
-              </button>
-            )}
-          </div>
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+                {pengurusData === undefined ? (
+                  <p className="text-sm font-medium text-slate-400 col-span-full py-4 px-2 animate-pulse">Memuat data pengurus harian...</p>
+                ) : pengurusData.map((p) => (
+                  <motion.div
+                    key={p._id}
+                    initial={{ opacity: 0, y: 5 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm group hover:border-indigo-300 hover:shadow-md transition-all flex flex-col gap-3"
+                  >
+                    <div className="flex items-start justify-between gap-4">
+                      <div className="flex-1 min-w-0">
+                        <p className="text-[9px] font-bold text-indigo-500 uppercase tracking-widest mb-1.5">{p.jabatan}</p>
+                        <h4 className="font-bold text-slate-900 text-sm md:text-[15px] leading-snug break-words">{p.nama}</h4>
+                      </div>
+                      {isAdmin && (
+                        <div className="flex items-center gap-1 shrink-0 opacity-100 sm:opacity-0 group-hover:opacity-100 transition-opacity">
+                          <button onClick={() => handleOpenPengurusModal(p)} className="p-1.5 bg-slate-50 text-slate-500 hover:text-indigo-600 hover:bg-indigo-50 rounded-lg transition-colors">
+                            <Edit2 className="w-3.5 h-3.5" />
+                          </button>
+                          <button onClick={() => handleDeletePengurus(p._id)} className="p-1.5 bg-slate-50 text-slate-500 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors">
+                            <Trash2 className="w-3.5 h-3.5" />
+                          </button>
+                        </div>
+                      )}
+                    </div>
+                  </motion.div>
+                ))}
+                {pengurusData && pengurusData.length === 0 && (
+                  <p className="text-sm font-medium text-slate-400 col-span-full py-4 px-2">Belum ada pengurus harian</p>
+                )}
+              </div>
+            </section>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {divisiData === undefined ? (
-              <p className="text-sm font-medium text-slate-400 col-span-full py-4 px-2 animate-pulse">Memuat data divisi...</p>
-            ) : divisiData.map((d, i) => (
-              <DivisionCard
-                key={d._id}
-                d={d as any}
-                index={i}
-                onOpenDetail={(item) => {
-                  setSelectedDivisi(item);
-                  setIsDetailOpen(true);
-                }}
-                isAdmin={isAdmin}
-              />
-            ))}
-            {divisiData && divisiData.length === 0 && (
-              <p className="text-sm font-medium text-slate-400 col-span-full py-4 px-2">Belum ada divisi</p>
-            )}
-          </div>
-        </section>
+            {/* DIVISI DIVISI */}
+            <section className="space-y-4 pt-4">
+              <div className="flex items-center justify-between px-1">
+                <div className="flex items-center gap-2">
+                  <div className="w-1.5 h-4 bg-indigo-600 rounded-full" />
+                  <h3 className="text-xs font-bold text-slate-500 uppercase tracking-[0.2em]">Struktur Divisi Kerja</h3>
+                </div>
+                {isAdmin && (
+                  <button
+                    onClick={() => handleOpenDivisiModal(null)}
+                    className="flex items-center gap-1.5 px-3 py-1.5 bg-indigo-50 text-indigo-600 rounded-lg text-xs font-bold hover:bg-indigo-100 transition-colors"
+                  >
+                    <Plus className="w-3.5 h-3.5" /> Tambah Divisi
+                  </button>
+                )}
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {divisiData === undefined ? (
+                  <p className="text-sm font-medium text-slate-400 col-span-full py-4 px-2 animate-pulse">Memuat data divisi...</p>
+                ) : divisiData.map((d, i) => (
+                  <DivisionCard
+                    key={d._id}
+                    d={d as any}
+                    index={i}
+                    onOpenDetail={(item) => {
+                      setSelectedDivisi(item);
+                      setIsDetailOpen(true);
+                    }}
+                    isAdmin={isAdmin}
+                  />
+                ))}
+                {divisiData && divisiData.length === 0 && (
+                  <p className="text-sm font-medium text-slate-400 col-span-full py-4 px-2">Belum ada divisi</p>
+                )}
+              </div>
+            </section>
+          </motion.div>
+        ) : (
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="pt-2"
+          >
+            <WorkflowDiagram />
+          </motion.div>
+        )}
 
         {/* PENGURUS HARIAN MODAL */}
         <AnimatePresence>
@@ -477,16 +515,16 @@ export default function SusunanPanitiaPage() {
                         </button>
                       </div>
                     </div>
-                      <div className="space-y-1.5">
-                        <label className="text-xs font-bold tracking-wide text-slate-500 uppercase">Job Description (Tupoksi)</label>
-                        <textarea
-                          className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all text-sm font-medium text-slate-900 placeholder:text-slate-400 min-h-[120px] resize-none"
-                          placeholder="Masukkan detail tugas dan tanggung jawab divisi..."
-                          value={divisiForm.jobDesc}
-                          onChange={e => setDivisiForm({ ...divisiForm, jobDesc: e.target.value })}
-                        />
-                      </div>
-                      <div className="h-4" />
+                    <div className="space-y-1.5">
+                      <label className="text-xs font-bold tracking-wide text-slate-500 uppercase">Job Description (Tupoksi)</label>
+                      <textarea
+                        className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all text-sm font-medium text-slate-900 placeholder:text-slate-400 min-h-[120px] resize-none"
+                        placeholder="Masukkan detail tugas dan tanggung jawab divisi..."
+                        value={divisiForm.jobDesc}
+                        onChange={e => setDivisiForm({ ...divisiForm, jobDesc: e.target.value })}
+                      />
+                    </div>
+                    <div className="h-4" />
                   </div>
 
                   {/* FLOATING SUBMIT BUTTON */}
