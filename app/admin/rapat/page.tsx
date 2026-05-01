@@ -2,7 +2,8 @@
 
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { MessageSquare, Calendar, FileText, ChevronRight, X, Info, CheckCircle2, Edit2, Trash2, Plus, GripVertical, ChevronUp, ChevronDown } from "lucide-react";
+import { MessageSquare, Calendar, FileText, ChevronRight, X, Info, CheckCircle2, Edit2, Trash2, Plus, GripVertical, ChevronUp, ChevronDown, ExternalLink } from "lucide-react";
+import Link from "next/link";
 
 import { useQuery, useMutation } from "convex/react";
 import { api } from "@/convex/_generated/api";
@@ -278,6 +279,18 @@ export default function HasilRapatPage() {
               </div>
 
               <div className="flex items-center justify-end gap-1.5 shrink-0 pt-3 sm:pt-0 border-t border-slate-100 sm:border-none w-full sm:w-auto">
+                {/* Public link button */}
+                <Link
+                  href={`/notulensi/${rapat._id}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  onClick={(e) => e.stopPropagation()}
+                  className="flex items-center gap-1.5 px-3 py-2 sm:px-2.5 sm:py-2 text-indigo-400 bg-indigo-50 sm:bg-transparent rounded-xl hover:text-indigo-600 hover:bg-indigo-100 transition-colors"
+                  title="Lihat halaman publik"
+                >
+                  <ExternalLink className="w-4 h-4" /> <span className="text-[10px] font-bold sm:hidden">Lihat</span>
+                </Link>
+
                 {isAdmin && (
                   <>
                     <button

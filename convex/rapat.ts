@@ -11,6 +11,14 @@ export const getAll = query({
   },
 });
 
+/** Ambil satu notulensi berdasarkan ID */
+export const getById = query({
+  args: { id: v.id("rapat") },
+  handler: async (ctx, args) => {
+    return await ctx.db.get(args.id);
+  },
+});
+
 // ── MUTATIONS ─────────────────────────────────────────────
 
 /** Buat notulensi rapat baru */
