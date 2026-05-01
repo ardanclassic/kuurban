@@ -73,10 +73,10 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
 
   return (
     <AdminGuard>
-      <div className="flex min-h-screen bg-zinc-50 overflow-hidden font-sans">
+      <div className="flex h-screen bg-zinc-50 overflow-hidden font-sans">
 
         {/* DESKTOP SIDEBAR */}
-        <aside className="w-64 bg-indigo-950 text-indigo-50 flex flex-col hidden md:flex shrink-0">
+        <aside className="w-64 bg-indigo-950 text-indigo-50 flex-col hidden md:flex shrink-0 sticky top-0 h-screen overflow-y-auto">
           <SidebarContent />
         </aside>
 
@@ -135,7 +135,7 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
           </header>
 
           {/* CONTENT AREA */}
-          <div className="flex-1 pt-16 md:pt-20 px-2 sm:px-4 py-4 md:p-8 overflow-y-auto w-full">
+          <div className="flex-1 pt-16 md:pt-20 px-2 sm:px-4 py-4 md:p-8 overflow-y-auto h-screen w-full">
             {children}
           </div>
         </main>

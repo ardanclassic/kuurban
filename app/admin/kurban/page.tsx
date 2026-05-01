@@ -265,7 +265,7 @@ export default function AdminKurbanPage() {
             <>
               {/* GROUPS - SAPI KELOMPOK */}
               {sortedGroupKeys.length > 0 && (
-                <div className="space-y-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   {sortedGroupKeys.map((groupKey) => (
                     <div key={groupKey} className="bg-indigo-50/60 border border-indigo-100 rounded-[1.5rem] p-4 md:p-5 shadow-sm space-y-4">
                       <div className="flex items-center justify-between px-1">
@@ -285,39 +285,42 @@ export default function AdminKurbanPage() {
                 </div>
               )}
 
-              {/* INDIVIDUAL ITEMS - SAPI MANDIRI */}
-              {sapiMandiriData.length > 0 && (
-                <div className="bg-emerald-50/60 border border-emerald-100 rounded-[1.5rem] p-4 md:p-5 shadow-sm space-y-4 mt-6">
-                  <div className="flex items-center justify-between px-1">
-                    <h3 className="text-sm font-black text-slate-800 uppercase tracking-widest flex items-center gap-2.5">
-                      <span className="w-2 h-2 rounded-full bg-emerald-500" />
-                      Sapi Mandiri
-                    </h3>
-                    <span className="text-[10px] font-bold text-slate-500 bg-slate-100 px-2.5 py-1 rounded-md">
-                      {sapiMandiriData.length} Orang
-                    </span>
-                  </div>
-                  <div className="grid grid-cols-1 gap-3">
-                    {sapiMandiriData.map((item, i) => renderItemCard(item, i))}
-                  </div>
-                </div>
-              )}
+              {/* INDIVIDUAL ITEMS - SAPI MANDIRI & KAMBING */}
+              {(sapiMandiriData.length > 0 || kambingData.length > 0) && (
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-2">
+                  {sapiMandiriData.length > 0 && (
+                    <div className="bg-emerald-50/60 border border-emerald-100 rounded-[1.5rem] p-4 md:p-5 shadow-sm space-y-4">
+                      <div className="flex items-center justify-between px-1">
+                        <h3 className="text-sm font-black text-slate-800 uppercase tracking-widest flex items-center gap-2.5">
+                          <span className="w-2 h-2 rounded-full bg-emerald-500" />
+                          Sapi Mandiri
+                        </h3>
+                        <span className="text-[10px] font-bold text-slate-500 bg-slate-100 px-2.5 py-1 rounded-md">
+                          {sapiMandiriData.length} Orang
+                        </span>
+                      </div>
+                      <div className="grid grid-cols-1 gap-3">
+                        {sapiMandiriData.map((item, i) => renderItemCard(item, i))}
+                      </div>
+                    </div>
+                  )}
 
-              {/* INDIVIDUAL ITEMS - KAMBING */}
-              {kambingData.length > 0 && (
-                <div className="bg-amber-50/60 border border-amber-100 rounded-[1.5rem] p-4 md:p-5 shadow-sm space-y-4 mt-6">
-                  <div className="flex items-center justify-between px-1">
-                    <h3 className="text-sm font-black text-slate-800 uppercase tracking-widest flex items-center gap-2.5">
-                      <span className="w-2 h-2 rounded-full bg-amber-500" />
-                      Kambing
-                    </h3>
-                    <span className="text-[10px] font-bold text-slate-500 bg-slate-100 px-2.5 py-1 rounded-md">
-                      {kambingData.length} Orang
-                    </span>
-                  </div>
-                  <div className="grid grid-cols-1 gap-3">
-                    {kambingData.map((item, i) => renderItemCard(item, i))}
-                  </div>
+                  {kambingData.length > 0 && (
+                    <div className="bg-amber-50/60 border border-amber-100 rounded-[1.5rem] p-4 md:p-5 shadow-sm space-y-4">
+                      <div className="flex items-center justify-between px-1">
+                        <h3 className="text-sm font-black text-slate-800 uppercase tracking-widest flex items-center gap-2.5">
+                          <span className="w-2 h-2 rounded-full bg-amber-500" />
+                          Kambing
+                        </h3>
+                        <span className="text-[10px] font-bold text-slate-500 bg-slate-100 px-2.5 py-1 rounded-md">
+                          {kambingData.length} Orang
+                        </span>
+                      </div>
+                      <div className="grid grid-cols-1 gap-3">
+                        {kambingData.map((item, i) => renderItemCard(item, i))}
+                      </div>
+                    </div>
+                  )}
                 </div>
               )}
             </>
