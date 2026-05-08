@@ -482,18 +482,19 @@ export default function HasilRapatPage() {
                     <div className="space-y-1.5">
                       <label className="text-xs font-bold tracking-wide text-slate-500 uppercase">Deskripsi Umum</label>
                       <textarea
-                        ref={e => {
-                          if (e) {
-                            e.style.height = 'auto';
-                            e.style.height = e.scrollHeight + 'px';
+                        rows={1}
+                        ref={el => {
+                          if (el) {
+                            el.style.height = '0px';
+                            el.style.height = `${el.scrollHeight}px`;
                           }
                         }}
-                        className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all text-sm font-bold text-slate-900 placeholder:text-slate-400 placeholder:font-medium resize-none overflow-hidden"
+                        className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all text-sm font-bold text-slate-900 placeholder:text-slate-400 placeholder:font-medium resize-none overflow-hidden leading-relaxed"
                         placeholder="Rapat ini membahas langkah awal..."
                         value={formData.fullDesc}
                         onChange={e => {
-                          e.target.style.height = 'auto';
-                          e.target.style.height = e.target.scrollHeight + 'px';
+                          e.target.style.height = '0px';
+                          e.target.style.height = `${e.target.scrollHeight}px`;
                           setFormData({ ...formData, fullDesc: e.target.value })
                         }}
                       />
@@ -530,25 +531,31 @@ export default function HasilRapatPage() {
                               <GripVertical className="w-4 h-4" />
                             </div>
 
-                            {/* TEXTAREA */}
+                            {/* TEXTAREA with improved auto-resize */}
                             <textarea
-                              ref={e => {
-                                if (e) {
-                                  e.style.height = 'auto';
-                                  e.style.height = e.scrollHeight + 'px';
-                                }
-                              }}
+                              rows={1}
                               value={point}
                               placeholder={`Poin ${idx + 1}...`}
                               onChange={e => {
                                 const val = e.target.value;
-                                e.target.style.height = 'auto';
-                                e.target.style.height = e.target.scrollHeight + 'px';
+                                e.target.style.height = '0px';
+                                e.target.style.height = `${e.target.scrollHeight}px`;
+                                
                                 const newPoints = [...formData.points];
                                 newPoints[idx] = val;
                                 setFormData({ ...formData, points: newPoints });
                               }}
-                              className="flex-1 w-full min-h-[40px] px-2 py-2 bg-transparent focus:outline-none resize-none overflow-hidden text-sm font-bold text-slate-900 placeholder:text-slate-400 placeholder:font-medium"
+                              onFocus={e => {
+                                e.target.style.height = '0px';
+                                e.target.style.height = `${e.target.scrollHeight}px`;
+                              }}
+                              ref={el => {
+                                if (el) {
+                                  el.style.height = '0px';
+                                  el.style.height = `${el.scrollHeight}px`;
+                                }
+                              }}
+                              className="flex-1 w-full min-h-[40px] px-2 py-2 bg-transparent focus:outline-none resize-none overflow-hidden text-sm font-bold text-slate-900 placeholder:text-slate-400 placeholder:font-medium leading-relaxed"
                             />
 
                             {/* ACTION GROUP: inline right */}
@@ -595,10 +602,10 @@ export default function HasilRapatPage() {
                   </div>
 
                   {/* FLOATING SUBMIT BUTTON */}
-                  <div className="absolute bottom-0 left-0 right-0 p-4 pt-10 pointer-events-none z-10 bg-gradient-to-t from-white via-white/80 to-transparent">
+                  <div className="sticky bottom-0 left-0 right-0 p-4 pt-10 pointer-events-none z-20 bg-gradient-to-t from-white via-white/90 to-transparent">
                     <button
                       type="submit"
-                      className="w-full pointer-events-auto bg-indigo-600 text-white py-3.5 rounded-xl font-bold flex items-center justify-center gap-2 shadow-xl shadow-indigo-600/30 ring-1 ring-white/20 active:scale-95 transition-all text-sm"
+                      className="w-full pointer-events-auto bg-indigo-600 text-white py-3.5 rounded-xl font-bold flex items-center justify-center gap-2 shadow-xl shadow-indigo-600/30 ring-1 ring-white/20 active:scale-95 transition-all text-sm hover:bg-indigo-700"
                     >
                       Simpan Putusan
                     </button>
