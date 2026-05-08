@@ -23,7 +23,7 @@ export default function AdminKurbanPage() {
   const updateKurban = useMutation(api.shohibulKurban.update);
   const removeKurban = useMutation(api.shohibulKurban.remove);
 
-  const kurbanData = rawKurbanData ? [...rawKurbanData].reverse() : [];
+  const kurbanData = rawKurbanData ? [...rawKurbanData] : [];
   const isLoading = rawKurbanData === undefined;
 
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);

@@ -26,7 +26,7 @@ export default function CowGroupCard({
   index: number;
   onRegister: (groupName: string) => void;
 }) {
-  const [isExpanded, setIsExpanded] = useState(!group.isFull);
+  const [isExpanded, setIsExpanded] = useState(true);
 
   const remaining = group.totalSlots - group.filledSlots.length;
   const percentFilled = (group.filledSlots.length / group.totalSlots) * 100;
