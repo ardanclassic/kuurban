@@ -56,7 +56,7 @@ export default function HasilRapatPage() {
         // Selalu restore data agar tidak tertimpa saat useEffect autosave berjalan
         setFormData(parsed.formData);
         setEditingId(parsed.editingId);
-        
+
         if (parsed.isFormModalOpen) {
           setIsFormModalOpen(true);
         }
@@ -108,7 +108,7 @@ export default function HasilRapatPage() {
           setIsFormModalOpen(true);
           return;
         }
-      } catch (err) {}
+      } catch (err) { }
     }
 
     setFormData({
@@ -134,7 +134,7 @@ export default function HasilRapatPage() {
           setIsFormModalOpen(true);
           return;
         }
-      } catch (err) {}
+      } catch (err) { }
     }
 
     setFormData({
@@ -201,7 +201,7 @@ export default function HasilRapatPage() {
         points: pointsArray
       })
     }
-    
+
     // Clear draft and close modal
     localStorage.removeItem("kuurban_rapat_draft");
     setIsFormModalOpen(false);
@@ -481,107 +481,137 @@ export default function HasilRapatPage() {
 
                     <div className="space-y-1.5">
                       <label className="text-xs font-bold tracking-wide text-slate-500 uppercase">Deskripsi Umum</label>
-                      <textarea
-                        rows={1}
-                        ref={el => {
-                          if (el) {
-                            el.style.height = '0px';
-                            el.style.height = `${el.scrollHeight}px`;
-                          }
-                        }}
-                        className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all text-sm font-bold text-slate-900 placeholder:text-slate-400 placeholder:font-medium resize-none overflow-hidden leading-relaxed"
-                        placeholder="Rapat ini membahas langkah awal..."
-                        value={formData.fullDesc}
-                        onChange={e => {
-                          e.target.style.height = '0px';
-                          e.target.style.height = `${e.target.scrollHeight}px`;
-                          setFormData({ ...formData, fullDesc: e.target.value })
-                        }}
-                      />
+                      <div className="grid overflow-hidden">
+                        <div
+                          className="invisible w-full px-4 py-3 text-sm font-bold leading-relaxed whitespace-pre-wrap break-words border border-transparent pointer-events-none"
+                          style={{ gridArea: '1 / 1 / 2 / 2' }}
+                        >
+                          {formData.fullDesc + "\n"}
+                        </div>
+                        <textarea
+                          className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all text-sm font-bold text-slate-900 placeholder:text-slate-400 placeholder:font-medium resize-none overflow-hidden leading-relaxed"
+                          style={{ gridArea: '1 / 1 / 2 / 2' }}
+                          placeholder="Rapat ini membahas langkah awal..."
+                          value={formData.fullDesc}
+                          onChange={e => setFormData({ ...formData, fullDesc: e.target.value })}
+                        />
+                      </div>
                     </div>
 
                     <div className="space-y-1.5">
                       <label className="text-xs font-bold tracking-wide text-slate-500 uppercase">Poin Kesepakatan</label>
                       <div className="space-y-2">
-                        {formData.points.map((point, idx) => (
-                          <div
-                            key={idx}
-                            draggable
-                            onDragStart={() => setDragIndex(idx)}
-                            onDragOver={(e) => { e.preventDefault(); setDragOverIndex(idx); }}
-                            onDragEnd={() => { setDragIndex(null); setDragOverIndex(null); }}
-                            onDrop={(e) => {
-                              e.preventDefault();
-                              if (dragIndex === null || dragIndex === idx) return;
-                              const newPoints = [...formData.points];
-                              const [moved] = newPoints.splice(dragIndex, 1);
-                              newPoints.splice(idx, 0, moved);
-                              setFormData({ ...formData, points: newPoints });
-                              setDragIndex(null);
-                              setDragOverIndex(null);
-                            }}
-                            className={`group relative flex items-start gap-2 p-1.5 bg-slate-50 border rounded-xl transition-all focus-within:bg-white focus-within:ring-2 focus-within:ring-indigo-500/20 focus-within:border-indigo-500 ${dragOverIndex === idx && dragIndex !== idx
-                              ? 'ring-2 ring-indigo-400 bg-indigo-50/50'
-                              : 'border-slate-200'
-                              } ${dragIndex === idx ? 'opacity-40' : 'opacity-100'
-                              }`}
-                          >
-                            {/* Drag Handle (Desktop) */}
-                            <div className="flex flex-col items-center shrink-0 pt-2.5 pl-1 cursor-grab active:cursor-grabbing text-slate-300 hover:text-indigo-500 sm:opacity-0 sm:group-hover:opacity-100 transition-all touch-none hidden sm:flex">
-                              <GripVertical className="w-4 h-4" />
-                            </div>
+                        {formData.points.map((point, idx) => {
+                          const colors = [
+                            { bg: 'focus-within:bg-indigo-50/50', header: 'group-focus-within:bg-indigo-50/95', border: 'focus-within:border-indigo-100', accent: 'bg-indigo-500', text: 'group-focus-within:text-indigo-500', bgHeader: 'group-focus-within:bg-indigo-50/30' },
+                            { bg: 'focus-within:bg-emerald-50/50', header: 'group-focus-within:bg-emerald-50/95', border: 'focus-within:border-emerald-100', accent: 'bg-emerald-500', text: 'group-focus-within:text-emerald-500', bgHeader: 'group-focus-within:bg-emerald-50/30' },
+                            { bg: 'focus-within:bg-amber-50/50', header: 'group-focus-within:bg-amber-50/95', border: 'focus-within:border-amber-100', accent: 'bg-amber-500', text: 'group-focus-within:text-amber-500', bgHeader: 'group-focus-within:bg-amber-50/30' },
+                            { bg: 'focus-within:bg-rose-50/50', header: 'group-focus-within:bg-rose-50/95', border: 'focus-within:border-rose-100', accent: 'bg-rose-500', text: 'group-focus-within:text-rose-500', bgHeader: 'group-focus-within:bg-rose-50/30' },
+                            { bg: 'focus-within:bg-sky-50/50', header: 'group-focus-within:bg-sky-50/95', border: 'focus-within:border-sky-100', accent: 'bg-sky-500', text: 'group-focus-within:text-sky-500', bgHeader: 'group-focus-within:bg-sky-50/30' },
+                            { bg: 'focus-within:bg-violet-50/50', header: 'group-focus-within:bg-violet-50/95', border: 'focus-within:border-violet-100', accent: 'bg-violet-500', text: 'group-focus-within:text-violet-500', bgHeader: 'group-focus-within:bg-violet-50/30' },
+                          ];
+                          const color = colors[idx % colors.length];
 
-                            {/* TEXTAREA with improved auto-resize */}
-                            <textarea
-                              rows={1}
-                              value={point}
-                              placeholder={`Poin ${idx + 1}...`}
-                              onChange={e => {
-                                const val = e.target.value;
-                                e.target.style.height = '0px';
-                                e.target.style.height = `${e.target.scrollHeight}px`;
-                                
+                          return (
+                            <div
+                              key={idx}
+                              draggable
+                              onDragStart={() => setDragIndex(idx)}
+                              onDragOver={(e) => { e.preventDefault(); setDragOverIndex(idx); }}
+                              onDragEnd={() => { setDragIndex(null); setDragOverIndex(null); }}
+                              onDrop={(e) => {
+                                e.preventDefault();
+                                if (dragIndex === null || dragIndex === idx) return;
                                 const newPoints = [...formData.points];
-                                newPoints[idx] = val;
+                                const [moved] = newPoints.splice(dragIndex, 1);
+                                newPoints.splice(idx, 0, moved);
                                 setFormData({ ...formData, points: newPoints });
+                                setDragIndex(null);
+                                setDragOverIndex(null);
                               }}
-                              onFocus={e => {
-                                e.target.style.height = '0px';
-                                e.target.style.height = `${e.target.scrollHeight}px`;
-                              }}
-                              ref={el => {
-                                if (el) {
-                                  el.style.height = '0px';
-                                  el.style.height = `${el.scrollHeight}px`;
-                                }
-                              }}
-                              className="flex-1 w-full min-h-[40px] px-2 py-2 bg-transparent focus:outline-none resize-none overflow-hidden text-sm font-bold text-slate-900 placeholder:text-slate-400 placeholder:font-medium leading-relaxed"
-                            />
+                              className={`group relative flex flex-col sm:flex-row items-stretch sm:items-start gap-1 sm:gap-2 p-2 border rounded-2xl transition-all duration-500
+                                bg-white border-slate-100
+                                ${color.bg} ${color.border}
+                                ${dragOverIndex === idx && dragIndex !== idx ? 'ring-2 ring-indigo-400 bg-indigo-50/50' : ''} 
+                                ${dragIndex === idx ? 'opacity-40' : 'opacity-100'}
+                                focus-within:ring-4 focus-within:ring-indigo-500/5
+                              `}
+                            >
+                              {/* Focus Accent Border */}
+                              <div className={`absolute left-0 top-2 bottom-2 w-1 rounded-r-full ${color.accent} opacity-0 group-focus-within:opacity-100 transition-all duration-500 shadow-[0_0_8px_rgba(99,102,241,0.3)]`} />
 
-                            {/* ACTION GROUP: inline right */}
-                            <div className="flex items-center gap-0.5 shrink-0 pt-2 pr-1 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-all">
-                              <button type="button" onClick={() => swapPoints(idx, idx - 1)} disabled={idx === 0}
-                                className="p-1 text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-md disabled:opacity-30 transition-colors">
-                                <ChevronUp className="w-4 h-4" />
-                              </button>
-                              <button type="button" onClick={() => swapPoints(idx, idx + 1)} disabled={idx === formData.points.length - 1}
-                                className="p-1 text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-md disabled:opacity-30 transition-colors">
-                                <ChevronDown className="w-4 h-4" />
-                              </button>
-                              
-                              <div className="w-px h-4 bg-slate-200 mx-1" />
-                              
-                              <button
-                                type="button"
-                                onClick={() => setConfirmDeletePointIdx(idx)}
-                                className="p-1 text-slate-400 hover:text-red-500 hover:bg-red-50 rounded-md transition-colors"
-                                title="Hapus poin ini"
-                              >
-                                <Trash2 className="w-4 h-4" />
-                              </button>
+                              {/* HEADER ROW (Mobile) / SIDE COLUMN (Desktop) - STICKY MODE */}
+                              <div className={`sticky -top-4 z-10 flex items-center justify-between sm:flex-col sm:justify-start sm:shrink-0 sm:pt-1.5 gap-1 border-b border-slate-100 sm:border-none pb-1 sm:pb-0 mb-1 sm:mb-0 
+                                bg-white/95 ${color.header} backdrop-blur-sm transition-all duration-500
+                              `}>
+                                <div className="flex items-center gap-2 sm:flex-col sm:gap-1">
+                                  <span className={`text-[10px] font-black text-slate-300 ${color.text} group-focus-within:scale-110 transition-all tabular-nums bg-slate-50 ${color.bgHeader} px-2 py-0.5 sm:p-1.5 rounded-md shadow-sm`}>
+                                    {(idx + 1).toString().padStart(2, '0')}
+                                  </span>
+                                  <div className="flex flex-col items-center cursor-grab active:cursor-grabbing text-slate-200 group-focus-within:text-slate-400 sm:opacity-0 sm:group-hover:opacity-100 transition-all touch-none hidden sm:flex">
+                                    <GripVertical className="w-3.5 h-3.5" />
+                                  </div>
+                                </div>
+
+                                {/* Action Buttons for Mobile (Compact Sticky) */}
+                                <div className="flex sm:hidden items-center gap-1">
+                                  <button type="button" onClick={() => swapPoints(idx, idx - 1)} disabled={idx === 0}
+                                    className="p-1.5 text-slate-400 disabled:opacity-10"><ChevronUp className="w-4 h-4" /></button>
+                                  <button type="button" onClick={() => swapPoints(idx, idx + 1)} disabled={idx === formData.points.length - 1}
+                                    className="p-1.5 text-slate-400 disabled:opacity-10"><ChevronDown className="w-4 h-4" /></button>
+                                  <div className="w-px h-3 bg-slate-200 mx-1" />
+                                  <button type="button" onClick={() => setConfirmDeletePointIdx(idx)}
+                                    className="p-1.5 text-red-400"><Trash2 className="w-4 h-4" /></button>
+                                </div>
+                              </div>
+
+                              {/* TEXTAREA AREA - Full Width on Mobile */}
+                              <div className="grid flex-1 min-h-[40px] overflow-hidden">
+                                <div
+                                  className="invisible w-full px-1 sm:px-2 py-1.5 text-sm font-bold leading-relaxed whitespace-pre-wrap break-words border border-transparent pointer-events-none"
+                                  style={{ gridArea: '1 / 1 / 2 / 2' }}
+                                >
+                                  {point + "\n"}
+                                </div>
+                                <textarea
+                                  value={point}
+                                  placeholder={`Ketik poin kesepakatan ke-${idx + 1}...`}
+                                  onChange={e => {
+                                    const val = e.target.value;
+                                    const newPoints = [...formData.points];
+                                    newPoints[idx] = val;
+                                    setFormData({ ...formData, points: newPoints });
+                                  }}
+                                  style={{ gridArea: '1 / 1 / 2 / 2' }}
+                                  className="w-full h-full px-1 sm:px-2 py-1.5 bg-transparent focus:outline-none resize-none overflow-hidden text-sm font-bold text-slate-900 placeholder:text-slate-300 placeholder:font-medium leading-relaxed"
+                                />
+                              </div>
+
+                              {/* ACTION GROUP (Desktop only) */}
+                              <div className="hidden sm:flex items-center gap-0.5 shrink-0 pt-1 pr-1 opacity-0 group-hover:opacity-100 transition-all">
+                                <button type="button" onClick={() => swapPoints(idx, idx - 1)} disabled={idx === 0}
+                                  className="p-1 text-slate-400 hover:text-indigo-600 hover:bg-indigo-100/50 rounded-lg disabled:opacity-10 transition-colors">
+                                  <ChevronUp className="w-4 h-4" />
+                                </button>
+                                <button type="button" onClick={() => swapPoints(idx, idx + 1)} disabled={idx === formData.points.length - 1}
+                                  className="p-1 text-slate-400 hover:text-indigo-600 hover:bg-indigo-100/50 rounded-lg disabled:opacity-10 transition-colors">
+                                  <ChevronDown className="w-4 h-4" />
+                                </button>
+
+                                <div className="w-px h-4 bg-slate-200 mx-1 opacity-50" />
+
+                                <button
+                                  type="button"
+                                  onClick={() => setConfirmDeletePointIdx(idx)}
+                                  className="p-1 text-slate-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors"
+                                  title="Hapus poin ini"
+                                >
+                                  <Trash2 className="w-4 h-4" />
+                                </button>
+                              </div>
                             </div>
-                          </div>
-                        ))}
+                          );
+                        })}
                         <p className="text-[10px] text-slate-400 font-medium flex items-center gap-1.5 pt-1 pl-1">
                           <ChevronUp className="w-3 h-3" /><ChevronDown className="w-3 h-3" /> Gunakan panah untuk mengubah urutan
                         </p>
