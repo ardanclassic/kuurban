@@ -334,7 +334,7 @@ export default function AdminKurbanPage() {
         {/* COMPACT FOOTER STATS */}
         <div className="bg-slate-950 p-5 rounded-2xl text-center shadow-lg shadow-slate-950/20 w-full overflow-hidden">
           <p className="text-white font-bold text-[9px] uppercase tracking-[0.2em] opacity-80">
-            {rawKurbanData === undefined ? "Menghitung..." : `${filteredData.length} Shohibul Terfilter`}
+            {rawKurbanData === undefined ? "Menghitung..." : `${filteredData.length} Orang Terfilter`}
           </p>
         </div>
 

@@ -30,7 +30,23 @@ export default function AdminDashboard() {
 
   // Kalkulasi Stats
   const rawKurbanCount = kurbanData?.length ?? 0;
-  const countSapi = kurbanData?.filter(k => k.jenis.includes("Sapi")).length ?? 0;
+  
+  // 1. Hitung Sapi (Ekor)
+  const shohibulSapiMandiri = kurbanData?.filter(k => k.jenis === "Sapi Mandiri") ?? [];
+  const shohibulSapiKelompok = kurbanData?.filter(k => k.jenis === "Sapi Kelompok") ?? [];
+  
+  // Kelompok dihitung 1 ekor HANYA JIKA pendaftarnya sudah lengkap (7 orang)
+  const kelompokMap: Record<string, number> = {};
+  shohibulSapiKelompok.forEach(k => {
+    if (k.kelompok) {
+      kelompokMap[k.kelompok] = (kelompokMap[k.kelompok] || 0) + 1;
+    }
+  });
+  const fullGroupsCount = Object.values(kelompokMap).filter(count => count === 7).length;
+  
+  const totalEkorSapi = shohibulSapiMandiri.length + fullGroupsCount;
+  
+  // 2. Hitung Kambing (Ekor) - 1 Shohibul = 1 Ekor
   const countKambing = kurbanData?.filter(k => k.jenis === "Kambing").length ?? 0;
 
   const countPengurus = pengurusData?.length ?? 0;
@@ -38,10 +54,38 @@ export default function AdminDashboard() {
   const totalPanitia = countPengurus + countAnggotaDivisi;
 
   const stats = [
-    { label: "Total Shohibul Qurban", value: kurbanData === undefined ? "-" : rawKurbanCount.toString(), trend: "Orang", icon: Users, color: "text-indigo-600", bg: "bg-indigo-50" },
-    { label: "Total Sapi (Kelompok & Mandiri)", value: kurbanData === undefined ? "-" : countSapi.toString(), trend: "Sapi", icon: ShieldCheck, color: "text-emerald-600", bg: "bg-emerald-50" },
-    { label: "Total Kambing", value: kurbanData === undefined ? "-" : countKambing.toString(), trend: "Ekor", icon: ShoppingBag, color: "text-amber-600", bg: "bg-amber-50" },
-    { label: "Total Panitia", value: (pengurusData === undefined || divisiData === undefined) ? "-" : totalPanitia.toString(), trend: "Aktif", icon: Users, color: "text-rose-600", bg: "bg-rose-50" },
+    { 
+      label: "Total Shohibul Qurban", 
+      value: kurbanData === undefined ? "-" : rawKurbanCount.toString(), 
+      trend: "Orang", 
+      icon: Users, 
+      color: "text-indigo-600", 
+      bg: "bg-indigo-50" 
+    },
+    { 
+      label: "Total Sapi (Kelompok & Mandiri)", 
+      value: kurbanData === undefined ? "-" : totalEkorSapi.toString(), 
+      trend: "Ekor Sapi", 
+      icon: ShieldCheck, 
+      color: "text-emerald-600", 
+      bg: "bg-emerald-50" 
+    },
+    { 
+      label: "Total Kambing", 
+      value: kurbanData === undefined ? "-" : countKambing.toString(), 
+      trend: "Ekor", 
+      icon: ShoppingBag, 
+      color: "text-amber-600", 
+      bg: "bg-amber-50" 
+    },
+    { 
+      label: "Total Panitia", 
+      value: (pengurusData === undefined || divisiData === undefined) ? "-" : totalPanitia.toString(), 
+      trend: "Aktif", 
+      icon: Users, 
+      color: "text-rose-600", 
+      bg: "bg-rose-50" 
+    },
   ];
 
   // Latest Update Rapat
