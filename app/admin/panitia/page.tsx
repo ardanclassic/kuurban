@@ -522,7 +522,7 @@ export default function SusunanPanitiaPage() {
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   exit={{ opacity: 0 }}
-                  className="fixed inset-0 z-[1000] flex items-center justify-center bg-slate-950/95 backdrop-blur-xl touch-none overflow-hidden"
+                  className="fixed inset-0 z-[1000] flex items-center justify-center bg-slate-950/90 backdrop-blur-xl touch-none overflow-hidden"
                 >
                   <div className="absolute inset-0 flex items-center justify-center overflow-hidden">
                     <motion.div
@@ -538,12 +538,13 @@ export default function SusunanPanitiaPage() {
                         bottom: ((1.4 * zoomScale - 0.8) * windowSize.h) / 2 + 100 * zoomScale,
                       }}
                       dragElastic={0.05}
-                      className="relative cursor-grab active:cursor-grabbing"
+                      className="relative select-none"
                     >
                       <img
                         src={fullscreenData.url}
                         alt="Fullscreen View"
-                        className="max-w-[none] w-[140vw] shadow-2xl rounded-xl transition-transform duration-200"
+                        onDoubleClick={() => setZoomScale(zoomScale === 1 ? 2 : 1)}
+                        className="max-w-[none] w-[140vw] shadow-2xl rounded-xl transition-transform duration-200 cursor-grab active:cursor-grabbing pointer-events-auto"
                         draggable={false}
                       />
                     </motion.div>
@@ -567,32 +568,7 @@ export default function SusunanPanitiaPage() {
 
                   {/* FOOTER: Unified Floating Controller */}
                   <div className="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-4 w-full px-6 z-20 pointer-events-none">
-                    <div className="bg-slate-900/80 backdrop-blur-2xl border border-white/10 p-2 rounded-[2rem] flex items-center gap-1 shadow-2xl pointer-events-auto">
-                      {/* Slide Navigation (Only for Slides) */}
-                      {fullscreenData.type === 'slides' && (
-                        <>
-                          <button
-                            disabled={fullscreenData.index === 0}
-                            onClick={() => {
-                              setZoomScale(1);
-                              const prevIdx = fullscreenData.index - 1;
-                              setFullscreenData({
-                                type: 'slides',
-                                index: prevIdx,
-                                url: `/assets/carousel workflow/Blueprint_Operasional_Kurban_1447_H_page-00${(prevIdx + 1).toString().padStart(2, '0')}.jpg`
-                              });
-                            }}
-                            className={cn(
-                              "w-10 h-10 md:w-12 md:h-12 rounded-full hover:bg-white/10 text-white flex items-center justify-center transition-all",
-                              fullscreenData.index === 0 && "opacity-20 cursor-not-allowed"
-                            )}
-                          >
-                            <ChevronLeft className="w-5 h-5" />
-                          </button>
-                          <div className="w-px h-6 bg-white/10 mx-1" />
-                        </>
-                      )}
-
+                    <div className="bg-slate-900/50 backdrop-blur-sm border border-white/10 p-2 rounded-[2rem] flex items-center gap-1 shadow-2xl pointer-events-auto">
                       {/* Zoom Controls (Shared) */}
                       <div className="flex items-center gap-1">
                         <button
@@ -621,36 +597,11 @@ export default function SusunanPanitiaPage() {
                           <ZoomIn className="w-4 h-4 md:w-5 md:h-5" />
                         </button>
                       </div>
-
-                      {/* Slide Navigation Next (Only for Slides) */}
-                      {fullscreenData.type === 'slides' && (
-                        <>
-                          <div className="w-px h-6 bg-white/10 mx-1" />
-                          <button
-                            disabled={fullscreenData.index === 10}
-                            onClick={() => {
-                              setZoomScale(1);
-                              const nextIdx = fullscreenData.index + 1;
-                              setFullscreenData({
-                                type: 'slides',
-                                index: nextIdx,
-                                url: `/assets/carousel workflow/Blueprint_Operasional_Kurban_1447_H_page-00${(nextIdx + 1).toString().padStart(2, '0')}.jpg`
-                              });
-                            }}
-                            className={cn(
-                              "w-10 h-10 md:w-12 md:h-12 rounded-full hover:bg-white/10 text-white flex items-center justify-center transition-all",
-                              fullscreenData.index === 10 && "opacity-20 cursor-not-allowed"
-                            )}
-                          >
-                            <ChevronRight className="w-5 h-5" />
-                          </button>
-                        </>
-                      )}
                     </div>
 
                     {/* Compact Dots (Only for Slides) */}
                     {fullscreenData.type === 'slides' && (
-                      <div className="flex items-center gap-1.5 px-4 py-2 bg-slate-900/40 backdrop-blur-md rounded-full border border-white/5">
+                      <div className="flex items-center gap-1.5 px-4 py-2 bg-slate-900/40 backdrop-blur-md rounded-full border border-white/5 shadow-lg">
                         {[...Array(11)].map((_, i) => (
                           <button
                             key={i}
@@ -663,14 +614,56 @@ export default function SusunanPanitiaPage() {
                               });
                             }}
                             className={cn(
-                              "w-1 h-1 rounded-full transition-all",
-                              i === fullscreenData.index ? "bg-indigo-500 w-3" : "bg-white/20 hover:bg-white/40"
+                              "w-1 h-1 rounded-full transition-all hover:scale-150",
+                              i === fullscreenData.index ? "bg-indigo-500 w-3 shadow-[0_0_8px_rgba(99,102,241,0.4)]" : "bg-white/20 hover:bg-white/40"
                             )}
                           />
                         ))}
                       </div>
                     )}
                   </div>
+
+                  {/* SIDE NAVIGATION: Separate Floating Buttons */}
+                  {fullscreenData.type === 'slides' && (
+                    <div className="absolute inset-x-0 top-1/2 -translate-y-1/2 flex items-center justify-between px-4 md:px-8 pointer-events-none z-30">
+                      <button
+                        disabled={fullscreenData.index === 0}
+                        onClick={() => {
+                          setZoomScale(1);
+                          const prevIdx = fullscreenData.index - 1;
+                          setFullscreenData({
+                            type: 'slides',
+                            index: prevIdx,
+                            url: `/assets/carousel workflow/Blueprint_Operasional_Kurban_1447_H_page-00${(prevIdx + 1).toString().padStart(2, '0')}.jpg`
+                          });
+                        }}
+                        className={cn(
+                          "pointer-events-auto w-12 h-12 md:w-14 md:h-14 rounded-full bg-white/50 hover:bg-slate-500/30 backdrop-blur-sm border border-white/10 text-gray-500 flex items-center justify-center transition-all shadow-2xl hover:scale-110 active:scale-95 group",
+                          fullscreenData.index === 0 && "opacity-0 pointer-events-none"
+                        )}
+                      >
+                        <ChevronLeft className="w-6 h-6 group-hover:-translate-x-0.5 transition-transform" />
+                      </button>
+                      <button
+                        disabled={fullscreenData.index === 10}
+                        onClick={() => {
+                          setZoomScale(1);
+                          const nextIdx = fullscreenData.index + 1;
+                          setFullscreenData({
+                            type: 'slides',
+                            index: nextIdx,
+                            url: `/assets/carousel workflow/Blueprint_Operasional_Kurban_1447_H_page-00${(nextIdx + 1).toString().padStart(2, '0')}.jpg`
+                          });
+                        }}
+                        className={cn(
+                          "pointer-events-auto w-12 h-12 md:w-14 md:h-14 rounded-full bg-white/50 hover:bg-slate-900/80 backdrop-blur-sm border border-white/10 text-gray-500 flex items-center justify-center transition-all shadow-2xl hover:scale-110 active:scale-95 group",
+                          fullscreenData.index === 10 && "opacity-0 pointer-events-none"
+                        )}
+                      >
+                        <ChevronRight className="w-6 h-6 group-hover:translate-x-0.5 transition-transform" />
+                      </button>
+                    </div>
+                  )}
                 </motion.div>
               )}
             </AnimatePresence>
