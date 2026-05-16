@@ -69,6 +69,7 @@ export default function SusunanPanitiaPage() {
   const isAdmin = role === "admin";
   const [activeTab, setActiveTab] = useState<'struktur' | 'alur'>('struktur');
   const [subTab, setSubTab] = useState<'infografis' | 'slides' | 'video'>('infografis');
+  const [activeSlideIndex, setActiveSlideIndex] = useState(0);
   const [fullscreenData, setFullscreenData] = useState<{ url: string, type: 'infografis' | 'slides', index: number } | null>(null);
   const [zoomScale, setZoomScale] = useState(1);
   const [windowSize, setWindowSize] = useState({ w: 1200, h: 800 });
@@ -363,7 +364,7 @@ export default function SusunanPanitiaPage() {
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            className="space-y-6 pb-20"
+            className="space-y-6 pb-20 w-full overflow-hidden"
           >
             {/* SUB-TAB NAVIGATION */}
             <div className="flex items-center gap-1.5 p-1 bg-slate-100 rounded-xl w-fit">
@@ -402,15 +403,15 @@ export default function SusunanPanitiaPage() {
                 >
                   <div
                     onClick={() => {
-                      setZoomScale(1);
+                      setZoomScale(0.5);
                       setFullscreenData({ url: '/assets/infography.png', type: 'infografis', index: 0 });
                     }}
-                    className="relative w-full aspect-auto min-h-[300px] max-h-[500px] bg-slate-50 rounded-3xl overflow-hidden cursor-pointer group transition-all hover:ring-2 hover:ring-indigo-500/20 flex items-center justify-center"
+                    className="relative w-full bg-slate-50 rounded-3xl overflow-hidden cursor-pointer group transition-all hover:ring-2 hover:ring-indigo-500/20 flex items-center justify-center"
                   >
                     <img
                       src="/assets/infography.png"
                       alt="Infografis Alur Kerja"
-                      className="max-w-full max-h-full object-contain p-2"
+                      className="w-full h-auto object-contain"
                     />
 
                     {/* Hover Overlay */}
@@ -430,41 +431,130 @@ export default function SusunanPanitiaPage() {
                   initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: -10 }}
-                  className="space-y-6"
+                  className="space-y-4 w-full max-w-full"
                 >
-                  <div className="relative">
-                    <div className="overflow-x-auto flex gap-4 pb-4 snap-x snap-mandatory scroll-smooth no-scrollbar px-1">
-                      {[...Array(11)].map((_, i) => {
-                        const imgPath = `/assets/carousel workflow/Blueprint_Operasional_Kurban_1447_H_page-00${(i + 1).toString().padStart(2, '0')}.jpg`;
-                        return (
-                          <div
-                            key={i}
-                            onClick={() => {
-                              setZoomScale(1);
-                              setFullscreenData({ url: imgPath, type: 'slides', index: i });
-                            }}
-                            className="min-w-[85%] md:min-w-[400px] max-h-[300px] aspect-[16/10] bg-slate-50 rounded-2xl overflow-hidden shrink-0 snap-center border border-slate-100 relative group/card cursor-pointer hover:ring-2 hover:ring-indigo-500/10 transition-all"
-                          >
-                            <img
-                              src={imgPath}
-                              alt={`Blueprint Page ${i + 1}`}
-                              className="w-full h-full object-contain bg-white"
-                            />
-                            <div className="absolute bottom-4 left-4 bg-slate-900/80 backdrop-blur-md px-3 py-1.5 rounded-lg text-white opacity-0 group-hover/card:opacity-100 transition-opacity">
-                              <p className="text-[10px] font-bold uppercase tracking-widest opacity-70 leading-none mb-1">Blueprint Page</p>
-                              <p className="text-sm font-black leading-none">{i + 1} / 11</p>
+                  <div className="relative group/viewer">
+                    {/* Main Slide Viewer */}
+                    <div className="relative aspect-[16/10] md:aspect-[16/9] w-full bg-white rounded-[2rem] overflow-hidden border border-slate-100 shadow-lg">
+                      <AnimatePresence mode="wait">
+                        <motion.div
+                          key={activeSlideIndex}
+                          initial={{ opacity: 0, scale: 0.98 }}
+                          animate={{ opacity: 1, scale: 1 }}
+                          exit={{ opacity: 0, scale: 0.98 }}
+                          transition={{ duration: 0.25, ease: "easeOut" }}
+                          className="absolute inset-0 cursor-pointer"
+                          onClick={() => {
+                            setZoomScale(0.5);
+                            const imgPath = `/assets/carousel workflow/Blueprint_Operasional_Kurban_1447_H_page-00${(activeSlideIndex + 1).toString().padStart(2, '0')}.jpg`;
+                            setFullscreenData({ url: imgPath, type: 'slides', index: activeSlideIndex });
+                          }}
+                        >
+                          <img
+                            src={`/assets/carousel workflow/Blueprint_Operasional_Kurban_1447_H_page-00${(activeSlideIndex + 1).toString().padStart(2, '0')}.jpg`}
+                            alt={`Blueprint Page ${activeSlideIndex + 1}`}
+                            className="w-full h-full object-contain"
+                          />
+                          {/* Hover Inspect Overlay */}
+                          <div className="absolute inset-0 bg-slate-900/0 group-hover/viewer:bg-slate-900/10 transition-colors duration-200 flex items-center justify-center">
+                            <div className="flex items-center gap-2 bg-white/95 backdrop-blur-lg px-5 py-2.5 rounded-2xl shadow-xl border border-slate-100 opacity-0 group-hover/viewer:opacity-100 transition-all duration-200 translate-y-1 group-hover/viewer:translate-y-0">
+                              <Maximize2 className="w-4 h-4 text-indigo-600" />
+                              <span className="text-xs font-bold text-slate-800">Buka Fullscreen</span>
                             </div>
                           </div>
-                        );
-                      })}
+                        </motion.div>
+                      </AnimatePresence>
+
+                      {/* Side Navigation Buttons */}
+                      <div className="absolute inset-x-3 top-1/2 -translate-y-1/2 flex items-center justify-between pointer-events-none z-10">
+                        <button
+                          disabled={activeSlideIndex === 0}
+                          onClick={(e) => { e.stopPropagation(); setActiveSlideIndex(p => Math.max(0, p - 1)); }}
+                          className={cn(
+                            "pointer-events-auto w-10 h-10 rounded-full flex items-center justify-center transition-all duration-200",
+                            "bg-white/85 backdrop-blur-md border border-slate-200/80 shadow-lg text-slate-600 hover:text-indigo-600 hover:bg-white hover:shadow-xl hover:scale-105 active:scale-95",
+                            activeSlideIndex === 0 && "opacity-0 pointer-events-none"
+                          )}
+                        >
+                          <ChevronLeft className="w-5 h-5" />
+                        </button>
+                        <button
+                          disabled={activeSlideIndex === 10}
+                          onClick={(e) => { e.stopPropagation(); setActiveSlideIndex(p => Math.min(10, p + 1)); }}
+                          className={cn(
+                            "pointer-events-auto w-10 h-10 rounded-full flex items-center justify-center transition-all duration-200",
+                            "bg-white/85 backdrop-blur-md border border-slate-200/80 shadow-lg text-slate-600 hover:text-indigo-600 hover:bg-white hover:shadow-xl hover:scale-105 active:scale-95",
+                            activeSlideIndex === 10 && "opacity-0 pointer-events-none"
+                          )}
+                        >
+                          <ChevronRight className="w-5 h-5" />
+                        </button>
+                      </div>
                     </div>
 
-                    {/* Minimal Pagination */}
-                    <div className="flex justify-center gap-1.5 mt-2">
+                  {/* Controls Row: Counter + Dots + Inspect shortcut */}
+                  <div className="flex items-center justify-between mt-3 px-0.5">
+                    <span className="text-xs font-bold tabular-nums tracking-tight">
+                      <span className="text-slate-700">{activeSlideIndex + 1}</span>
+                      <span className="text-slate-400 opacity-60"> / 11</span>
+                    </span>
+
+                    {/* Pill Dot Indicators */}
+                    <div className="flex items-center gap-1">
                       {[...Array(11)].map((_, i) => (
-                        <div key={i} className="w-1 h-1 rounded-full bg-slate-200" />
+                        <button
+                          key={i}
+                          onClick={() => setActiveSlideIndex(i)}
+                          className={cn(
+                            "h-1.5 rounded-full transition-all duration-300 ease-out",
+                            activeSlideIndex === i
+                              ? "w-5 bg-indigo-500"
+                              : "w-1.5 bg-slate-200 hover:bg-indigo-300"
+                          )}
+                        />
                       ))}
                     </div>
+
+                    <button
+                      onClick={() => {
+                        setZoomScale(0.5);
+                        const imgPath = `/assets/carousel workflow/Blueprint_Operasional_Kurban_1447_H_page-00${(activeSlideIndex + 1).toString().padStart(2, '0')}.jpg`;
+                        setFullscreenData({ url: imgPath, type: 'slides', index: activeSlideIndex });
+                      }}
+                      className="flex items-center gap-1.5 text-[11px] font-bold text-slate-400 hover:text-indigo-600 transition-colors"
+                    >
+                      <Maximize2 className="w-3.5 h-3.5" />
+                      Inspect
+                    </button>
+                  </div>
+
+                  </div>
+
+                  {/* Thumbnail Rail */}
+                  <div className="flex gap-2 overflow-x-auto no-scrollbar pb-1 pt-0.5">
+                    {[...Array(11)].map((_, i) => (
+                      <button
+                        key={i}
+                        onClick={() => setActiveSlideIndex(i)}
+                        className={cn(
+                          "relative shrink-0 w-[68px] md:w-[84px] aspect-video rounded-xl overflow-hidden transition-all duration-200",
+                          activeSlideIndex === i
+                            ? "ring-2 ring-indigo-500 ring-offset-1 shadow-md opacity-100"
+                            : "opacity-35 hover:opacity-65 ring-1 ring-transparent hover:ring-slate-200"
+                        )}
+                      >
+                        <img
+                          src={`/assets/carousel workflow/Blueprint_Operasional_Kurban_1447_H_page-00${(i + 1).toString().padStart(2, '0')}.jpg`}
+                          className="w-full h-full object-cover"
+                          alt=""
+                        />
+                        {activeSlideIndex === i && (
+                          <div className="absolute bottom-1 right-1 bg-indigo-500 text-white rounded-md px-1.5 py-px">
+                            <span className="text-[8px] font-black leading-tight">{i + 1}</span>
+                          </div>
+                        )}
+                      </button>
+                    ))}
                   </div>
                 </motion.div>
               )}
@@ -524,29 +614,40 @@ export default function SusunanPanitiaPage() {
                   exit={{ opacity: 0 }}
                   className="fixed inset-0 z-[1000] flex items-center justify-center bg-slate-950/90 backdrop-blur-xl touch-none overflow-hidden"
                 >
-                  <div className="absolute inset-0 flex items-center justify-center overflow-hidden">
+                  <div className="absolute inset-0 flex items-center justify-center overflow-hidden pointer-events-none">
+                    {/* Drag wrapper — handles position, no scale transform here to ensure 1:1 pointer tracking */}
                     <motion.div
-                      key={fullscreenData.url}
-                      initial={{ scale: 0.8, opacity: 0 }}
-                      animate={{ scale: zoomScale, opacity: 1 }}
-                      exit={{ scale: 0.8, opacity: 0 }}
+                      key={`drag-${fullscreenData.url}`}
                       drag
                       dragConstraints={{
-                        left: -((1.4 * zoomScale - 1) * windowSize.w) / 2 - 100 * zoomScale,
-                        right: ((1.4 * zoomScale - 1) * windowSize.w) / 2 + 100 * zoomScale,
-                        top: -((1.4 * zoomScale - 0.8) * windowSize.h) / 2 - 100 * zoomScale,
-                        bottom: ((1.4 * zoomScale - 0.8) * windowSize.h) / 2 + 100 * zoomScale,
+                        left: -(Math.max(0, 1.4 * windowSize.w * zoomScale - windowSize.w) / 2 + 100),
+                        right: Math.max(0, 1.4 * windowSize.w * zoomScale - windowSize.w) / 2 + 100,
+                        top: -(Math.max(0, 2.5 * windowSize.w * zoomScale - windowSize.h) / 2 + 100),
+                        bottom: Math.max(0, 2.5 * windowSize.w * zoomScale - windowSize.h) / 2 + 100,
                       }}
-                      dragElastic={0.05}
-                      className="relative select-none"
+                      dragElastic={0.1}
+                      dragMomentum={true}
+                      className="relative pointer-events-auto flex items-center justify-center"
+                      style={{ cursor: "grab" }}
+                      whileTap={{ cursor: "grabbing" }}
                     >
-                      <img
-                        src={fullscreenData.url}
-                        alt="Fullscreen View"
-                        onDoubleClick={() => setZoomScale(zoomScale === 1 ? 2 : 1)}
-                        className="max-w-[none] w-[140vw] shadow-2xl rounded-xl transition-transform duration-200 cursor-grab active:cursor-grabbing pointer-events-auto"
-                        draggable={false}
-                      />
+                      {/* Scale wrapper — handles zoom visually */}
+                      <motion.div
+                        animate={{ scale: zoomScale }}
+                        transition={{ type: "spring", stiffness: 300, damping: 30 }}
+                        className="relative select-none"
+                      >
+                        <img
+                          src={fullscreenData.url}
+                          alt="Fullscreen View"
+                          onDoubleClick={(e) => {
+                            e.stopPropagation();
+                            setZoomScale(prev => prev === zoomScale ? (zoomScale < 1.5 ? 2 : 0.5) : zoomScale);
+                          }}
+                          className="max-w-[none] w-[140vw] shadow-2xl rounded-xl pointer-events-auto"
+                          draggable={false}
+                        />
+                      </motion.div>
                     </motion.div>
                   </div>
 
@@ -606,7 +707,7 @@ export default function SusunanPanitiaPage() {
                           <button
                             key={i}
                             onClick={() => {
-                              setZoomScale(1);
+                              setZoomScale(0.5);
                               setFullscreenData({
                                 type: 'slides',
                                 index: i,
@@ -629,7 +730,7 @@ export default function SusunanPanitiaPage() {
                       <button
                         disabled={fullscreenData.index === 0}
                         onClick={() => {
-                          setZoomScale(1);
+                          setZoomScale(0.5);
                           const prevIdx = fullscreenData.index - 1;
                           setFullscreenData({
                             type: 'slides',
@@ -647,7 +748,7 @@ export default function SusunanPanitiaPage() {
                       <button
                         disabled={fullscreenData.index === 10}
                         onClick={() => {
-                          setZoomScale(1);
+                          setZoomScale(0.5);
                           const nextIdx = fullscreenData.index + 1;
                           setFullscreenData({
                             type: 'slides',
