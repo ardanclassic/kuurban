@@ -1,8 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Briefcase, Users, Star, Award, ChevronDown, Edit2, Trash2, Plus, X, Route } from "lucide-react";
+import { Briefcase, Users, Star, Award, ChevronDown, Edit2, Trash2, Plus, X, Route, Maximize2, Presentation, Play, Info, Eye, Image as ImageIcon, ChevronLeft, ChevronRight, ZoomIn, ZoomOut, RotateCcw } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useQuery, useMutation } from "convex/react";
 import { api } from "@/convex/_generated/api";
@@ -10,7 +10,6 @@ import { Id } from "@/convex/_generated/dataModel";
 import ConfirmDialog from "@/components/ui/ConfirmDialog";
 import { useAuth } from "@/lib/auth-context";
 import FullScreenLoader from "@/components/ui/FullScreenLoader";
-import WorkflowDiagram from "@/components/WorkflowDiagram";
 
 function DivisionCard({
   d,
@@ -68,7 +67,20 @@ function DivisionCard({
 export default function SusunanPanitiaPage() {
   const { role } = useAuth();
   const isAdmin = role === "admin";
-  const [activeTab, setActiveTab] = useState<'struktur' | 'alur'>('alur');
+  const [activeTab, setActiveTab] = useState<'struktur' | 'alur'>('struktur');
+  const [subTab, setSubTab] = useState<'infografis' | 'slides' | 'video'>('infografis');
+  const [fullscreenData, setFullscreenData] = useState<{ url: string, type: 'infografis' | 'slides', index: number } | null>(null);
+  const [zoomScale, setZoomScale] = useState(1);
+  const [windowSize, setWindowSize] = useState({ w: 1200, h: 800 });
+
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      setWindowSize({ w: window.innerWidth, h: window.innerHeight });
+      const handleResize = () => setWindowSize({ w: window.innerWidth, h: window.innerHeight });
+      window.addEventListener('resize', handleResize);
+      return () => window.removeEventListener('resize', handleResize);
+    }
+  }, []);
   const pengurusData = useQuery(api.panitia.getPengurusHarian);
   const divisiData = useQuery(api.panitia.getDivisiPanitia);
   const isLoading = pengurusData === undefined || divisiData === undefined;
@@ -349,11 +361,319 @@ export default function SusunanPanitiaPage() {
           </motion.div>
         ) : (
           <motion.div
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="pt-2"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            className="space-y-6 pb-20"
           >
-            <WorkflowDiagram />
+            {/* SUB-TAB NAVIGATION */}
+            <div className="flex items-center gap-1.5 p-1 bg-slate-100 rounded-xl w-fit">
+              {[
+                { id: 'infografis', label: 'Infografis', icon: ImageIcon },
+                { id: 'slides', label: 'Slides', icon: Presentation },
+                { id: 'video', label: 'Video', icon: Play },
+              ].map((tab) => {
+                const Icon = tab.icon;
+                return (
+                  <button
+                    key={tab.id}
+                    onClick={() => setSubTab(tab.id as any)}
+                    className={cn(
+                      "flex items-center gap-2 px-4 py-1.5 rounded-lg font-bold text-[11px] md:text-xs transition-all",
+                      subTab === tab.id
+                        ? "bg-white text-indigo-600 shadow-sm ring-1 ring-black/5"
+                        : "text-slate-500 hover:text-slate-700 hover:bg-slate-200/50"
+                    )}
+                  >
+                    <Icon className="w-3.5 h-3.5" />
+                    {tab.label}
+                  </button>
+                );
+              })}
+            </div>
+
+            <AnimatePresence mode="wait">
+              {subTab === 'infografis' && (
+                <motion.div
+                  key="infografis"
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -10 }}
+                  className="space-y-4"
+                >
+                  <div
+                    onClick={() => {
+                      setZoomScale(1);
+                      setFullscreenData({ url: '/assets/infography.png', type: 'infografis', index: 0 });
+                    }}
+                    className="relative w-full aspect-auto min-h-[300px] max-h-[500px] bg-slate-50 rounded-3xl overflow-hidden cursor-pointer group transition-all hover:ring-2 hover:ring-indigo-500/20 flex items-center justify-center"
+                  >
+                    <img
+                      src="/assets/infography.png"
+                      alt="Infografis Alur Kerja"
+                      className="max-w-full max-h-full object-contain p-2"
+                    />
+
+                    {/* Hover Overlay */}
+                    <div className="absolute inset-0 bg-slate-900/5 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                      <div className="bg-white/90 backdrop-blur-md px-4 py-2 rounded-xl shadow-xl flex items-center gap-2 scale-90 group-hover:scale-100 transition-transform">
+                        <Maximize2 className="w-4 h-4 text-indigo-600" />
+                        <span className="text-xs font-bold text-slate-900">Klik untuk Fullscreen</span>
+                      </div>
+                    </div>
+                  </div>
+                </motion.div>
+              )}
+
+              {subTab === 'slides' && (
+                <motion.div
+                  key="slides"
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -10 }}
+                  className="space-y-6"
+                >
+                  <div className="relative">
+                    <div className="overflow-x-auto flex gap-4 pb-4 snap-x snap-mandatory scroll-smooth no-scrollbar px-1">
+                      {[...Array(11)].map((_, i) => {
+                        const imgPath = `/assets/carousel workflow/Blueprint_Operasional_Kurban_1447_H_page-00${(i + 1).toString().padStart(2, '0')}.jpg`;
+                        return (
+                          <div
+                            key={i}
+                            onClick={() => {
+                              setZoomScale(1);
+                              setFullscreenData({ url: imgPath, type: 'slides', index: i });
+                            }}
+                            className="min-w-[85%] md:min-w-[400px] max-h-[300px] aspect-[16/10] bg-slate-50 rounded-2xl overflow-hidden shrink-0 snap-center border border-slate-100 relative group/card cursor-pointer hover:ring-2 hover:ring-indigo-500/10 transition-all"
+                          >
+                            <img
+                              src={imgPath}
+                              alt={`Blueprint Page ${i + 1}`}
+                              className="w-full h-full object-contain bg-white"
+                            />
+                            <div className="absolute bottom-4 left-4 bg-slate-900/80 backdrop-blur-md px-3 py-1.5 rounded-lg text-white opacity-0 group-hover/card:opacity-100 transition-opacity">
+                              <p className="text-[10px] font-bold uppercase tracking-widest opacity-70 leading-none mb-1">Blueprint Page</p>
+                              <p className="text-sm font-black leading-none">{i + 1} / 11</p>
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+
+                    {/* Minimal Pagination */}
+                    <div className="flex justify-center gap-1.5 mt-2">
+                      {[...Array(11)].map((_, i) => (
+                        <div key={i} className="w-1 h-1 rounded-full bg-slate-200" />
+                      ))}
+                    </div>
+                  </div>
+                </motion.div>
+              )}
+
+              {subTab === 'video' && (
+                <motion.div
+                  key="video"
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -10 }}
+                >
+                  <div className="bg-slate-900 rounded-[2.5rem] overflow-hidden relative border border-white/5 shadow-2xl">
+                    <div className="relative aspect-video w-full bg-black">
+                      <video
+                        controls
+                        className="w-full h-full"
+                        poster="/assets/infography.png"
+                      >
+                        <source src="/assets/SOP & Alur Kerja.mp4" type="video/mp4" />
+                        Browser Anda tidak mendukung tag video.
+                      </video>
+                    </div>
+
+                    <div className="p-6 md:p-8 flex flex-col md:flex-row md:items-start justify-between gap-6">
+                      <div className="space-y-3">
+                        <div className="inline-flex items-center gap-2 px-3 py-1 bg-white/10 rounded-full">
+                          <span className="w-1.5 h-1.5 rounded-full bg-indigo-400 animate-pulse" />
+                          <p className="text-[9px] font-black text-indigo-300 uppercase tracking-widest">Official SOP Video</p>
+                        </div>
+                        <h4 className="text-white font-bold text-xl">Panduan Operasional Kurban 1447 H</h4>
+                        <p className="text-slate-400 text-sm font-medium leading-relaxed max-w-xl">
+                          Penjelasan komprehensif mengenai prosedur teknis penyembelihan, pengolahan, hingga sistem distribusi paket daging shohibul kurban.
+                        </p>
+                      </div>
+                      <div className="grid grid-cols-2 gap-4 shrink-0">
+                        <div className="p-3 bg-white/5 rounded-xl border border-white/5">
+                          <p className="text-[8px] font-black text-slate-500 uppercase mb-1">Format</p>
+                          <p className="text-xs font-bold text-white">4K MP4</p>
+                        </div>
+                        <div className="p-3 bg-white/5 rounded-xl border border-white/5">
+                          <p className="text-[8px] font-black text-slate-500 uppercase mb-1">Source</p>
+                          <p className="text-xs font-bold text-white">Al Ukhuwah</p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
+
+            {/* FULLSCREEN IMAGE MODAL */}
+            <AnimatePresence mode="wait">
+              {fullscreenData && (
+                <motion.div
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  className="fixed inset-0 z-[1000] flex items-center justify-center bg-slate-950/95 backdrop-blur-xl touch-none overflow-hidden"
+                >
+                  <div className="absolute inset-0 flex items-center justify-center overflow-hidden">
+                    <motion.div
+                      key={fullscreenData.url}
+                      initial={{ scale: 0.8, opacity: 0 }}
+                      animate={{ scale: zoomScale, opacity: 1 }}
+                      exit={{ scale: 0.8, opacity: 0 }}
+                      drag
+                      dragConstraints={{
+                        left: -((1.4 * zoomScale - 1) * windowSize.w) / 2 - 100 * zoomScale,
+                        right: ((1.4 * zoomScale - 1) * windowSize.w) / 2 + 100 * zoomScale,
+                        top: -((1.4 * zoomScale - 0.8) * windowSize.h) / 2 - 100 * zoomScale,
+                        bottom: ((1.4 * zoomScale - 0.8) * windowSize.h) / 2 + 100 * zoomScale,
+                      }}
+                      dragElastic={0.05}
+                      className="relative cursor-grab active:cursor-grabbing"
+                    >
+                      <img
+                        src={fullscreenData.url}
+                        alt="Fullscreen View"
+                        className="max-w-[none] w-[140vw] shadow-2xl rounded-xl transition-transform duration-200"
+                        draggable={false}
+                      />
+                    </motion.div>
+                  </div>
+
+                  {/* HEADER: Minimalist Top Bar */}
+                  <div className="absolute top-0 left-0 right-0 p-4 md:p-8 flex items-center justify-between pointer-events-none z-20">
+                    <div className="bg-slate-900/40 backdrop-blur-md border border-white/10 px-4 py-2 rounded-2xl flex items-center gap-3">
+                      <div className="w-2 h-2 rounded-full bg-indigo-500 animate-pulse" />
+                      <span className="text-white font-bold text-[10px] md:text-xs uppercase tracking-[0.2em]">
+                        {fullscreenData.type === 'infografis' ? 'Infografis Overview' : `Blueprint Page ${fullscreenData.index + 1} / 11`}
+                      </span>
+                    </div>
+                    <button
+                      onClick={() => setFullscreenData(null)}
+                      className="pointer-events-auto w-10 h-10 md:w-12 md:h-12 rounded-2xl bg-white/10 hover:bg-white/20 backdrop-blur-md border border-white/10 text-white flex items-center justify-center transition-all active:scale-95"
+                    >
+                      <X className="w-5 h-5 md:w-6 md:h-6" />
+                    </button>
+                  </div>
+
+                  {/* FOOTER: Unified Floating Controller */}
+                  <div className="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-4 w-full px-6 z-20 pointer-events-none">
+                    <div className="bg-slate-900/80 backdrop-blur-2xl border border-white/10 p-2 rounded-[2rem] flex items-center gap-1 shadow-2xl pointer-events-auto">
+                      {/* Slide Navigation (Only for Slides) */}
+                      {fullscreenData.type === 'slides' && (
+                        <>
+                          <button
+                            disabled={fullscreenData.index === 0}
+                            onClick={() => {
+                              setZoomScale(1);
+                              const prevIdx = fullscreenData.index - 1;
+                              setFullscreenData({
+                                type: 'slides',
+                                index: prevIdx,
+                                url: `/assets/carousel workflow/Blueprint_Operasional_Kurban_1447_H_page-00${(prevIdx + 1).toString().padStart(2, '0')}.jpg`
+                              });
+                            }}
+                            className={cn(
+                              "w-10 h-10 md:w-12 md:h-12 rounded-full hover:bg-white/10 text-white flex items-center justify-center transition-all",
+                              fullscreenData.index === 0 && "opacity-20 cursor-not-allowed"
+                            )}
+                          >
+                            <ChevronLeft className="w-5 h-5" />
+                          </button>
+                          <div className="w-px h-6 bg-white/10 mx-1" />
+                        </>
+                      )}
+
+                      {/* Zoom Controls (Shared) */}
+                      <div className="flex items-center gap-1">
+                        <button
+                          onClick={() => setZoomScale(prev => Math.max(0.5, prev - 0.25))}
+                          className="w-10 h-10 md:w-12 md:h-12 rounded-full hover:bg-white/10 text-white flex items-center justify-center transition-all"
+                        >
+                          <ZoomOut className="w-4 h-4 md:w-5 md:h-5" />
+                        </button>
+
+                        <button
+                          onClick={() => setZoomScale(1)}
+                          className="px-3 min-w-[60px] h-10 md:h-12 rounded-full hover:bg-white/10 text-white flex items-center justify-center transition-all group"
+                        >
+                          <div className="flex flex-col items-center">
+                            <span className="text-[10px] md:text-xs font-black tracking-tighter group-hover:hidden">
+                              {Math.round(zoomScale * 100)}%
+                            </span>
+                            <RotateCcw className="w-4 h-4 hidden group-hover:block" />
+                          </div>
+                        </button>
+
+                        <button
+                          onClick={() => setZoomScale(prev => Math.min(3, prev + 0.25))}
+                          className="w-10 h-10 md:w-12 md:h-12 rounded-full hover:bg-white/10 text-white flex items-center justify-center transition-all"
+                        >
+                          <ZoomIn className="w-4 h-4 md:w-5 md:h-5" />
+                        </button>
+                      </div>
+
+                      {/* Slide Navigation Next (Only for Slides) */}
+                      {fullscreenData.type === 'slides' && (
+                        <>
+                          <div className="w-px h-6 bg-white/10 mx-1" />
+                          <button
+                            disabled={fullscreenData.index === 10}
+                            onClick={() => {
+                              setZoomScale(1);
+                              const nextIdx = fullscreenData.index + 1;
+                              setFullscreenData({
+                                type: 'slides',
+                                index: nextIdx,
+                                url: `/assets/carousel workflow/Blueprint_Operasional_Kurban_1447_H_page-00${(nextIdx + 1).toString().padStart(2, '0')}.jpg`
+                              });
+                            }}
+                            className={cn(
+                              "w-10 h-10 md:w-12 md:h-12 rounded-full hover:bg-white/10 text-white flex items-center justify-center transition-all",
+                              fullscreenData.index === 10 && "opacity-20 cursor-not-allowed"
+                            )}
+                          >
+                            <ChevronRight className="w-5 h-5" />
+                          </button>
+                        </>
+                      )}
+                    </div>
+
+                    {/* Compact Dots (Only for Slides) */}
+                    {fullscreenData.type === 'slides' && (
+                      <div className="flex items-center gap-1.5 px-4 py-2 bg-slate-900/40 backdrop-blur-md rounded-full border border-white/5">
+                        {[...Array(11)].map((_, i) => (
+                          <button
+                            key={i}
+                            onClick={() => {
+                              setZoomScale(1);
+                              setFullscreenData({
+                                type: 'slides',
+                                index: i,
+                                url: `/assets/carousel workflow/Blueprint_Operasional_Kurban_1447_H_page-00${(i + 1).toString().padStart(2, '0')}.jpg`
+                              });
+                            }}
+                            className={cn(
+                              "w-1 h-1 rounded-full transition-all",
+                              i === fullscreenData.index ? "bg-indigo-500 w-3" : "bg-white/20 hover:bg-white/40"
+                            )}
+                          />
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
           </motion.div>
         )}
 
